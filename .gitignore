@@ -1,0 +1,41 @@
+# ===================================================================
+# 生成AI出現モニタリング（GEO） .gitignore
+# ===================================================================
+
+# ----- 機密情報（絶対にコミットしない） -----
+.env
+*.env
+!.env.example
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ----- バックアップ / 一時ファイル -----
+*.bak
+*.tmp
+*~
+
+# ----- 生成データ（フォルダ構造は .gitkeep で保持し、中身は追跡しない） -----
+monitoring/data/results/*
+monitoring/data/logs/*
+monitoring/data/reports/*
+monitoring/data/dashboard.html
+monitoring/data/run_log.txt
+!monitoring/data/results/.gitkeep
+!monitoring/data/logs/.gitkeep
+!monitoring/data/reports/.gitkeep
+
+# ----- アーカイブ / バイナリ（予算表・zip 等） -----
+*.zip
+*.xlsx
+*.xlsm
+
+# ----- OS 生成物 -----
+.DS_Store
+Thumbs.db
+desktop.ini

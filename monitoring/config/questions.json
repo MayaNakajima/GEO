@@ -1,0 +1,626 @@
+[
+  {
+    "id": "Q-C1-A1-B1-001",
+    "question": "大企業向けにオリジナルユニフォームを製作してくれる会社を教えてください",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A1-B1-002",
+    "question": "建設・運送業界向けの作業服をオーダーメイドできる会社はどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A1-B2-003",
+    "question": "アパレルメーカーが手がける法人ユニフォームブランドにはどんな企業がありますか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A2-B1-004",
+    "question": "従業員エンゲージメントを高めるためにユニフォームを活用する方法を教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A2-B2-005",
+    "question": "ユニフォームで企業ブランドを可視化・強化するにはどうすればいいですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A2-B1-006",
+    "question": "ユニフォームを採用強化・離職率低下に結びつけた事例を教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A3-B1-007",
+    "question": "企業ユニフォームの発注先を選ぶときに確認すべきポイントは？",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A4-B1-008",
+    "question": "2025〜2026年の法人向けユニフォーム市場のトレンドは何ですか？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A5-B2-009",
+    "question": "ユニフォームリニューアルで従業員の誇りや一体感が向上した企業事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A5-B1-010",
+    "question": "航空・運輸会社のユニフォームをデザインしている会社の実績を知りたい",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A1-B1-011",
+    "question": "サステナブルな素材を使ったオリジナルユニフォームを作れる会社は？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C1-A2-B2-012",
+    "question": "人的資本開示の観点から、ユニフォーム投資を経営戦略に組み込む方法は？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C1", "domain_label": "オリジナルユニフォーム",
+    "target_site": "uniform.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A1-B5-013",
+    "question": "高校の制服をオリジナルでデザインしてくれるメーカーを教えてください",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A1-B5-014",
+    "question": "学生服のモデルチェンジを検討しています。コンサルから対応できるメーカーはどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A2-B5-015",
+    "question": "制服リニューアルで志願者数や学校ブランドを向上させるにはどうすればよいですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A2-B5-016",
+    "question": "学校の「らしさ」を制服に反映させるプロジェクトの進め方を教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A3-B5-017",
+    "question": "学校が制服メーカーを選ぶときの比較基準を教えてください",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A4-B5-018",
+    "question": "高校制服のジェンダーフリー・多様性対応の最新動向は？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A5-B5-019",
+    "question": "制服リニューアルで学校ブランドが向上し志願者が増えた事例を教えてください",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A5-B5-020",
+    "question": "創立記念（周年）を機に制服とスクールブランディングを刷新した学校の事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A1-B5-021",
+    "question": "メーカー直販で学生服を購入できる会社はありますか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C2-A2-B5-022",
+    "question": "制服を通じた「服育」など、学校課題に対してユニフォームで貢献できることは何ですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C2", "domain_label": "スクール（学生服）",
+    "target_site": "school.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A1-B6b-023",
+    "question": "500床以上の病院に看護師向けの高品質メディカルウェアを提供しているメーカーは？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B6b", "stakeholder_label": "看護部長・副看護部長",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A1-B6c-024",
+    "question": "病院グループ全体のユニフォームを一括調達・管理できる医療ウェアメーカーはどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B6c", "stakeholder_label": "病院購買・調達担当",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A1-B6a-025",
+    "question": "病院ブランディングに貢献するデザイン性の高い白衣・スクラブを提案してくれる会社は？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A2-B6a-026",
+    "question": "医療機関のブランディングをメディカルウェアで強化するにはどうすればいいですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A2-B6b-027",
+    "question": "看護師の離職率を下げるためにできる職場環境改善の施策を教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B6b", "stakeholder_label": "看護部長・副看護部長",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A2-B6b-028",
+    "question": "病院スタッフのモチベーションやチームワーク向上に効果的な取り組みは？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B6b", "stakeholder_label": "看護部長・副看護部長",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A2-B6a-029",
+    "question": "患者からの信頼感・安心感を高めるための医療ウェア選びのポイントは？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A3-B6c-030",
+    "question": "病院がメディカルウェアを選定する際に重視すべきポイントは何ですか？",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B6c", "stakeholder_label": "病院購買・調達担当",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A4-B6a-031",
+    "question": "医療用白衣・スクラブの最新デザイントレンドは何ですか？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A4-B6a-032",
+    "question": "医療ウェアのサステナブル対応（環境配慮素材など）の最新動向は？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A5-B6a-033",
+    "question": "大学病院・大規模病院がメディカルウェアをリニューアルした成功事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3-A5-B6b-034",
+    "question": "スタッフのエンゲージメントを高めるためにメディカルウェアを刷新した病院の事例は？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B6b", "stakeholder_label": "看護部長・副看護部長",
+    "axis_domain": "C3", "domain_label": "メディカルウェア（病院向け）",
+    "target_site": "medical.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A1-B7a-035",
+    "question": "クリニック開業時にスクラブ・白衣をまとめて購入できるオンラインショップは？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B7a", "stakeholder_label": "クリニック院長・開業医",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A1-B7a-036",
+    "question": "医師・看護師向けのデザイン性の高い白衣ブランドのECサイトを教えてください",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B7a", "stakeholder_label": "クリニック院長・開業医",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A1-B7b-037",
+    "question": "看護師が個人でおしゃれなスクラブを購入できるオンラインショップはどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B7b", "stakeholder_label": "個人購入者（看護師等）",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A3-B7a-038",
+    "question": "クリニック向けの白衣・ユニフォームを選ぶ際のポイントを教えてください",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B7a", "stakeholder_label": "クリニック院長・開業医",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A4-B7b-039",
+    "question": "看護師・医療従事者向けのおしゃれなスクラブの最新トレンドは？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B7b", "stakeholder_label": "個人購入者（看護師等）",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A1-B7a-040",
+    "question": "オリジナルカラーで少量からスクラブをオーダーできるメーカー・ブランドはありますか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B7a", "stakeholder_label": "クリニック院長・開業医",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A5-B7a-041",
+    "question": "小規模クリニックが白衣・ユニフォームを刷新して患者満足度が上がった事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B7a", "stakeholder_label": "クリニック院長・開業医",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C3EC-A6-B7b-042",
+    "question": "Raffiriaとはどのようなブランドですか？",
+    "axis_type": "A6", "type_label": "企業情報直接型",
+    "axis_stakeholder": "B7b", "stakeholder_label": "個人購入者（看護師等）",
+    "axis_domain": "C3-EC", "domain_label": "メディカルウェア（ECサイト）",
+    "target_site": "onward-raffiria.shop", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A1-B3-043",
+    "question": "企業向けのノベルティグッズ・販促品を企画から製造まで対応できる会社は？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A1-B2-044",
+    "question": "OEM・ODMでブランドイメージを体現したオリジナルグッズを製作できる会社を教えてください",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A2-B3-045",
+    "question": "顧客エンゲージメントを高めるノベルティ・プロモーション施策のポイントを教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A2-B2-046",
+    "question": "コーポレートブランディングをグッズ・モノづくりで強化するにはどうすればよいですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A2-B2-047",
+    "question": "インナーブランディングに活用できるオリジナルグッズの企画・制作の進め方は？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A3-B3-048",
+    "question": "販促グッズ・ノベルティの発注先を選ぶ際のチェックポイントを教えてください",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A4-B3-049",
+    "question": "2025〜2026年の企業向けノベルティ・販促グッズのトレンドは？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A5-B3-050",
+    "question": "廃材・廃棄物をアップサイクルしてノベルティ・ブランドグッズに活用した企業事例は？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A5-B2-051",
+    "question": "インナーブランディングにオリジナルグッズを活用した大企業の成功事例を教えてください",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C4-A1-B3-052",
+    "question": "大手企業との豊富な取引実績がある販促・ブランディング支援会社はどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B3", "stakeholder_label": "マーケティング・販促担当",
+    "axis_domain": "C4", "domain_label": "インサイトセールス",
+    "target_site": "solution.onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A6-B8-053",
+    "question": "オンワードコーポレートデザインはどのような会社ですか？",
+    "axis_type": "A6", "type_label": "企業情報直接型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A6-B8-054",
+    "question": "オンワードグループのBtoB事業会社を教えてください",
+    "axis_type": "A6", "type_label": "企業情報直接型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A1-B8-055",
+    "question": "EcoVadisのシルバーメダルを取得している日本のユニフォームメーカーはどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A4-B8-056",
+    "question": "アパレルメーカーが手がける法人向けブランディング支援の最新トレンドは？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A2-B8-057",
+    "question": "企業のブランド価値向上をユニフォームや空間から支援するアプローチの事例を教えてください",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A6-B9-058",
+    "question": "オンワードコーポレートデザインへの就職・転職を検討しています。どのような会社ですか？",
+    "axis_type": "A6", "type_label": "企業情報直接型",
+    "axis_stakeholder": "B9", "stakeholder_label": "就職活動学生・転職希望者",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A1-B8-059",
+    "question": "顧客ブランド支援を一気通貫で行っている日本のBtoB企業はどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C5-A5-B8-060",
+    "question": "大手企業のブランド支援においてユニフォーム・グッズ・空間を組み合わせた事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B8", "stakeholder_label": "投資家・ESG担当・メディア",
+    "axis_domain": "C5", "domain_label": "コーポレート",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C6-A1-B2-061",
+    "question": "店舗やショールームの空間デザインをブランドコンセプトから提案してくれる会社はどこですか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A1-B1-062",
+    "question": "オフィスや企業施設の空間デザイン・内装リニューアルを手がける会社を教えてください",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B1", "stakeholder_label": "総務・購買担当",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A1-B6a-063",
+    "question": "病院・医療施設の空間デザイン（ホスピタルアート含む）を手がける会社は？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B6a", "stakeholder_label": "院長・理事長・会長（経営者）",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A1-B5-064",
+    "question": "学校の食堂・共用スペースをブランディングと連動してリデザインできる会社はありますか？",
+    "axis_type": "A1", "type_label": "業者推薦型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A2-B2-065",
+    "question": "企業のCI・VIリニューアルに合わせて店舗・オフィス空間を刷新するにはどうすればよいですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A2-B2-066",
+    "question": "空間デザインを通じてブランド体験を設計するにはどのようなアプローチが有効ですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A3-B2-067",
+    "question": "ブランド体験型の空間デザイン会社を選ぶ際のポイントは何ですか？",
+    "axis_type": "A3", "type_label": "比較・選定型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A4-B2-068",
+    "question": "企業のVI・空間ブランディングにおける2025〜2026年のトレンドは？",
+    "axis_type": "A4", "type_label": "トレンド・市場情報型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": false
+  },
+  {
+    "id": "Q-C6-A5-B2-069",
+    "question": "ユニフォームと空間デザインを連動させてブランド体験を統一した企業事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C6-A5-B5-070",
+    "question": "学校のアイデンティティを空間・制服・コミュニケーションで一体的に表現したプロジェクト事例は？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B5", "stakeholder_label": "教務担当・学校長",
+    "axis_domain": "C6", "domain_label": "空間ビジネス（スペースクリエイト）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A7-B4-071",
+    "question": "ユニフォーム・空間デザイン・ノベルティを一社にまとめてお願いできる会社はどこですか？",
+    "axis_type": "A7", "type_label": "ABM横断型",
+    "axis_stakeholder": "B4", "stakeholder_label": "大企業・横断担当",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A7-B4-072",
+    "question": "企業ブランドを「着る・飾る・使う」すべてで統一的に支援してくれるパートナー会社は？",
+    "axis_type": "A7", "type_label": "ABM横断型",
+    "axis_stakeholder": "B4", "stakeholder_label": "大企業・横断担当",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A7-B2-073",
+    "question": "大企業のブランド戦略を複数のタッチポイント（ユニフォーム・グッズ・空間）で実行支援できる会社は？",
+    "axis_type": "A7", "type_label": "ABM横断型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A2-B4-074",
+    "question": "複数の事業会社・系列会社のブランドを統合的に支援してくれる企業はどこですか？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B4", "stakeholder_label": "大企業・横断担当",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A5-B4-075",
+    "question": "一社の企業に対してユニフォーム・販促・ブランディングを横断的に支援した事例はありますか？",
+    "axis_type": "A5", "type_label": "事例・実績型",
+    "axis_stakeholder": "B4", "stakeholder_label": "大企業・横断担当",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A7-B2-076",
+    "question": "長期パートナーとして企業ブランドの構築・運用を一緒に担ってくれる会社を探しています",
+    "axis_type": "A7", "type_label": "ABM横断型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A2-B2-077",
+    "question": "企業のCI（コーポレートアイデンティティ）をユニフォーム・空間・グッズで具現化する方法は？",
+    "axis_type": "A2", "type_label": "課題解決型",
+    "axis_stakeholder": "B2", "stakeholder_label": "経営者・ブランドマネージャー",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  },
+  {
+    "id": "Q-C7-A7-B4-078",
+    "question": "系列病院グループのブランドを統一するために、ユニフォームから空間まで対応できる会社は？",
+    "axis_type": "A7", "type_label": "ABM横断型",
+    "axis_stakeholder": "B4", "stakeholder_label": "大企業・横断担当",
+    "axis_domain": "C7", "domain_label": "ABM横断（複数事業クロス）",
+    "target_site": "onward-cd.co.jp", "abm_relevant": true
+  }
+]

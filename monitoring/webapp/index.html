@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI出現モニタリング｜実行コンソール</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>🔍 AI出現モニタリング｜実行コンソール</h1>
+    <div class="sub">株式会社オンワードコーポレートデザイン｜GEO定点観測</div>
+  </div>
+  <div id="jp-badge" class="badge"></div>
+</header>
+
+<main>
+  <!-- ============ 設定パネル ============ -->
+  <section class="panel">
+    <h2>1. 観測するLLMを選択</h2>
+    <div class="row" style="margin-bottom:8px">
+      <button class="mini" id="sel-all">全選択</button>
+      <button class="mini" id="sel-none">全解除</button>
+      <span class="muted" id="model-count"></span>
+    </div>
+    <div id="models" class="models"></div>
+
+    <h2>2. 実行モード</h2>
+    <div class="seg">
+      <label><input type="radio" name="mode" value="manual" checked> 手動実行</label>
+      <label><input type="radio" name="mode" value="auto"> 自動実行（定期）</label>
+    </div>
+
+    <h2>3. 開始タイミング</h2>
+    <div class="seg">
+      <label><input type="radio" name="start" value="now" checked> <span id="start-now-label">すぐ実行</span></label>
+      <label><input type="radio" name="start" value="after_minutes">
+        <input type="number" id="start-min" min="1" value="10" class="num"> 分後に実行</label>
+    </div>
+
+    <h2>4. 繰り返し（1タイミング内）</h2>
+    <div class="seg">
+      <label><input type="radio" name="repeat" value="once" checked> 1回のみ</label>
+      <label><input type="radio" name="repeat" value="interval">
+        <input type="number" id="rep-int" min="1" value="10" class="num"> 分おきに
+        <input type="number" id="rep-cnt" min="2" value="3" class="num"> 回</label>
+    </div>
+    <p class="hint">※ 複数回実行すると、AIの回答の「ブレ（安定性）」を測定できます。</p>
+
+    <!-- 自動実行のみ：頻度 -->
+    <div id="freq-block" class="hidden">
+      <h2>5. 実行頻度（自動実行）</h2>
+      <div class="row">
+        <select id="freq-kind">
+          <option value="every_n_days">●日おき（毎日=1）</option>
+          <option value="weekly">毎週・毎〇曜日</option>
+          <option value="biweekly">隔週</option>
+          <option value="monthly_day">毎月〇日</option>
+          <option value="nth_weekday">第◆曜日</option>
+          <option value="nth_business_day">毎月 第□営業日</option>
+          <option value="first_business_day">月初 第1営業日</option>
+          <option value="last_business_day">月末 最終営業日</option>
+        </select>
+        <span>時刻 <input type="time" id="freq-time" value="09:00"></span>
+      </div>
+      <div id="freq-fields" class="freq-fields"></div>
+      <div class="preview" id="freq-preview"></div>
+    </div>
+
+    <h2 class="mt">オプション</h2>
+    <label class="chk">質問セット
+      <select id="qset">
+        <option value="set1">セット1（現行78問）</option>
+        <option value="set2">セット2（新規60問・特異度D1〜D4）</option>
+        <option value="both">両方（138問）</option>
+      </select></label>
+    <label class="chk"><input type="checkbox" id="dry-run"> ドライラン（API呼び出しなしで動作確認）</label>
+    <label class="chk"><input type="checkbox" id="domain-on"> 事業ドメインを絞る
+      <select id="domain" class="hidden-inline"></select></label>
+
+    <div class="actions">
+      <button class="primary" id="btn-run">▶ 実行する</button>
+      <button class="danger hidden" id="btn-stop">■ 自動実行を停止</button>
+      <button class="ghost" id="btn-cancel">中断</button>
+    </div>
+    <div id="msg" class="msg"></div>
+  </section>
+
+  <!-- ============ 実行状況 + レポート ============ -->
+  <section class="panel">
+    <h2>実行状況</h2>
+    <div class="status-card">
+      <div class="row between">
+        <span id="st-status" class="pill">待機中</span>
+        <span id="st-next" class="muted"></span>
+      </div>
+      <div id="st-message" class="st-message">待機中</div>
+      <div class="bar"><div id="st-bar" class="bar-in"></div></div>
+      <div id="st-detail" class="muted small"></div>
+    </div>
+
+    <h2>ログ</h2>
+    <pre id="log" class="log"></pre>
+
+    <h2>レポート</h2>
+    <div class="row">
+      <button class="primary" id="btn-dash">📊 ダッシュボードを開く</button>
+      <button class="mini" id="btn-export-all">⬇ 全rowデータCSV</button>
+    </div>
+    <div id="insights" class="insights"></div>
+    <h3>実行履歴</h3>
+    <table class="hist"><thead><tr><th>日時</th><th>モード</th><th>回数</th><th>平均</th><th>SD</th><th>安定性</th><th></th></tr></thead>
+      <tbody id="hist"></tbody></table>
+  </section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

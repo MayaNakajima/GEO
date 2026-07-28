@@ -1,0 +1,79 @@
+:root{
+  --bg:#0f172a; --panel:#1e293b; --ink:#e2e8f0; --sub:#94a3b8;
+  --accent:#38bdf8; --good:#34d399; --warn:#fbbf24; --bad:#f87171;
+  --line:#334155; --chip:#0b1220;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;font-size:14px;}
+header{display:flex;justify-content:space-between;align-items:center;
+  padding:18px 26px;border-bottom:1px solid var(--line);}
+header h1{margin:0;font-size:19px;}
+header .sub{color:var(--sub);font-size:12px;margin-top:3px;}
+.badge{font-size:11px;color:var(--sub);border:1px solid var(--line);
+  padding:4px 10px;border-radius:999px;}
+main{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 26px 60px;}
+@media(max-width:920px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;}
+h2{font-size:14px;margin:18px 0 8px;border-left:3px solid var(--accent);padding-left:8px;}
+h2:first-child{margin-top:0}
+h2.mt{margin-top:20px}
+h3{font-size:13px;color:var(--sub);margin:18px 0 6px;}
+.muted{color:var(--sub);} .small{font-size:12px;}
+.hint{color:var(--sub);font-size:12px;margin:6px 0 0;}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.row.between{justify-content:space-between;}
+
+/* モデル選択 */
+.models{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.models label{display:flex;gap:8px;align-items:center;background:var(--chip);
+  border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;}
+.models label.off{opacity:.55}
+.models .prov{color:var(--sub);font-size:11px;}
+
+/* セグメント（ラジオ群） */
+.seg{display:flex;flex-direction:column;gap:8px;}
+.seg label{display:flex;gap:8px;align-items:center;}
+.num{width:62px;background:var(--chip);color:var(--ink);border:1px solid var(--line);
+  border-radius:6px;padding:5px 7px;}
+input[type=time],select{background:var(--chip);color:var(--ink);border:1px solid var(--line);
+  border-radius:6px;padding:6px 8px;}
+.freq-fields{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.wd{display:flex;gap:6px;flex-wrap:wrap;}
+.wd label{display:flex;gap:4px;align-items:center;background:var(--chip);
+  border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;}
+.preview{margin-top:10px;background:var(--chip);border:1px solid var(--line);
+  border-radius:8px;padding:10px 12px;font-size:12px;color:var(--sub);white-space:pre-line;}
+.chk{display:flex;gap:8px;align-items:center;margin:6px 0;}
+.hidden-inline{display:none}
+.hidden{display:none}
+
+.actions{display:flex;gap:10px;margin-top:20px;}
+button{border:none;border-radius:9px;padding:10px 16px;font-size:14px;cursor:pointer;}
+button.primary{background:var(--accent);color:#04283a;font-weight:700;}
+button.danger{background:var(--bad);color:#3a0b0b;font-weight:700;}
+button.ghost{background:transparent;color:var(--sub);border:1px solid var(--line);}
+button.mini{background:var(--chip);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;}
+button:disabled{opacity:.5;cursor:not-allowed;}
+.msg{margin-top:12px;font-size:13px;min-height:18px;}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+
+/* ステータス */
+.status-card{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:14px;}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;
+  background:#0b1220;border:1px solid var(--line);}
+.pill.running{color:var(--warn);border-color:var(--warn)}
+.pill.scheduled{color:var(--accent);border-color:var(--accent)}
+.pill.idle{color:var(--sub)}
+.st-message{margin:10px 0;font-size:14px;}
+.bar{height:10px;background:#0b1220;border-radius:999px;overflow:hidden;border:1px solid var(--line);}
+.bar-in{height:100%;width:0;background:var(--accent);transition:width .3s;}
+.log{background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:12px;
+  height:170px;overflow:auto;font-size:12px;color:var(--sub);white-space:pre-wrap;}
+.insights .ins{border-left:4px solid var(--line);padding:9px 12px;margin:8px 0;
+  border-radius:6px;background:var(--chip);font-size:13px;}
+.ins.high{border-color:var(--bad)} .ins.medium{border-color:var(--warn)} .ins.info{border-color:var(--accent)}
+table.hist{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+table.hist th,table.hist td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;}
+table.hist th{color:var(--sub);font-weight:600;}
+a.exp{color:var(--accent);text-decoration:none;font-size:12px;}

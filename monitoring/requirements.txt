@@ -1,0 +1,24 @@
+# AI Citation Monitoring — 依存パッケージ
+# インストール: pip install -r requirements.txt
+
+# LLM クライアント
+openai>=1.30.0          # GPT-4o / Grok（OpenAI 互換 API）
+anthropic>=0.28.0       # Claude
+google-generativeai>=0.5.0  # Gemini
+
+# HTTP
+requests>=2.31.0
+
+# 環境変数
+python-dotenv>=1.0.0
+
+# SSL：OS(Windows)の証明書ストアを利用（社内CA・中間証明書によるSSLエラー対策）
+# 社内ネットワークで「certificate verify failed」になる場合に必須
+truststore>=0.9.0
+
+# 営業日判定（第□営業日・月末最終営業日などの自動実行スケジュール用）
+# ※ 未インストールでも動作します（その場合は土日のみ除外にフォールバック）
+jpholiday>=0.1.0
+
+# GUI（Webサーバ）は Python 標準ライブラリのみで動作するため追加不要
+

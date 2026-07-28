@@ -1,0 +1,44 @@
+{
+  "models": [
+    {
+      "id": "gpt-4o",
+      "provider": "openai",
+      "name": "GPT-4o",
+      "enabled": false,
+      "max_tokens": 800,
+      "temperature": 0.3
+    },
+    {
+      "id": "gemini-1.5-pro",
+      "provider": "google",
+      "name": "Gemini 1.5 Pro",
+      "enabled": false,
+      "max_tokens": 800,
+      "temperature": 0.3
+    },
+    {
+      "id": "sonar-pro",
+      "provider": "perplexity",
+      "name": "Perplexity Sonar Pro",
+      "enabled": false,
+      "max_tokens": 800,
+      "temperature": 0.3
+    },
+    {
+      "id": "claude-sonnet-5",
+      "provider": "anthropic",
+      "name": "Claude Sonnet 5",
+      "enabled": true,
+      "max_tokens": 800,
+      "temperature": 0.3
+    },
+    {
+      "id": "grok-3",
+      "provider": "xai",
+      "name": "Grok 3",
+      "enabled": false,
+      "max_tokens": 800,
+      "temperature": 0.3
+    }
+  ]
+}

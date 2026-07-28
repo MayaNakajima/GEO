@@ -1,0 +1,25 @@
+{
+  "_comment": "primary: 社名表記。secondary: 商品名・URL等の補助キーワード。domain_urls: ドメインごとの検出対象URL（コーポレートサイト + サービスサイト）",
+
+  "primary": [
+    "オンワードコーポレートデザイン",
+    "Onward Corporate Design"
+  ],
+
+  "secondary": [
+    "Raffiria",
+    "ラフィーリア",
+    "オンワードCD"
+  ],
+
+  "domain_urls": {
+    "C1":    ["onward-cd.co.jp", "uniform.onward-cd.co.jp"],
+    "C2":    ["onward-cd.co.jp", "school.onward-cd.co.jp"],
+    "C3":    ["onward-cd.co.jp", "medical.onward-cd.co.jp"],
+    "C3-EC": ["onward-raffiria.shop", "onward-cd.co.jp"],
+    "C4":    ["onward-cd.co.jp", "solution.onward-cd.co.jp"],
+    "C5":    ["onward-cd.co.jp"],
+    "C6":    ["onward-cd.co.jp"],
+    "C7":    ["onward-cd.co.jp"]
+  }
+}

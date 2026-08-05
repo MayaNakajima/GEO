@@ -40,10 +40,12 @@ import scheduler
 import dashboard
 import logger
 
-WEB_DIR     = BASE_DIR / "webapp"
-DATA_DIR    = BASE_DIR / "data"
-REPORTS_DIR = DATA_DIR / "reports"
-RESULTS_DIR = DATA_DIR / "results"
+WEB_DIR       = BASE_DIR / "webapp"
+DATA_DIR      = BASE_DIR / "data"
+REPORTS_DIR   = DATA_DIR / "reports"
+RESULTS_DIR   = DATA_DIR / "results"
+CONFIG_DIR    = BASE_DIR / "config"
+SCHEDULE_PATH = CONFIG_DIR / "schedule.json"
 
 HOST = "127.0.0.1"
 
@@ -316,6 +318,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(out, "text/html; charset=utf-8")
         if p == "/api/preview_schedule":
             return self._json(self._preview_schedule(parse_qs(u.query)))
+        if p == "/api/os_schedule":
+            return self._json(self._os_schedule_get())
         if p == "/api/export":
             return self._export(parse_qs(u.query))
         return self._json({"error": "unknown endpoint"}, 404)
@@ -345,6 +349,10 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/cancel":
             ok, msg = JOBS.cancel_current()
             return self._json({"ok": ok, "message": msg})
+        if p == "/api/os_schedule/save":
+            return self._json(self._os_schedule_save(b))
+        if p == "/api/os_schedule/disable":
+            return self._json(self._os_schedule_disable())
         return self._json({"error": "unknown endpoint"}, 404)
 
     # ---- プラン整形 ---- #
@@ -418,6 +426,99 @@ class Handler(BaseHTTPRequestHandler):
             out.append(nxt.strftime("%Y-%m-%d %H:%M"))
             after = nxt
         return {"desc": scheduler.describe_rule(rule), "next": out}
+
+    # ---- OS常駐スケジュール（schedule.json）の参照 ---- #
+    def _os_schedule_get(self):
+        """config/schedule.json の現在の内容と、次回予定・登録手順を返す。"""
+        if not SCHEDULE_PATH.exists():
+            return {"exists": False,
+                    "register_hint": self._register_hint()}
+        try:
+            conf = json.loads(SCHEDULE_PATH.read_text(encoding="utf-8"))
+        except Exception as e:
+            return {"exists": True, "error": f"schedule.json 読込エラー: {e}"}
+        rule = conf.get("rule", {})
+        try:
+            anchor = datetime.strptime(str(conf.get("anchor"))[:10], "%Y-%m-%d").date()
+        except Exception:
+            anchor = date.today()
+        # 今後の実行予定
+        nexts, after = [], datetime.now() - timedelta(seconds=1)
+        for _ in range(5):
+            nxt = scheduler.next_timing(rule, after=after, anchor=anchor)
+            if not nxt:
+                break
+            nexts.append(nxt.strftime("%Y-%m-%d %H:%M"))
+            after = nxt
+        return {"exists": True,
+                "enabled": conf.get("enabled", True),
+                "desc": scheduler.describe_rule(rule),
+                "rule": rule,
+                "anchor": str(conf.get("anchor", anchor)),
+                "plan": conf.get("plan", {}),
+                "dry_run": conf.get("dry_run", False),
+                "next": nexts,
+                "register_hint": self._register_hint(rule.get("time", "09:00"))}
+
+    def _register_hint(self, time="09:00"):
+        """タスク登録用のコマンド文字列（画面表示・コピペ用）。"""
+        return {
+            "bat": "register_scheduled_task.bat",
+            "time": time,
+            "note": "monitoring フォルダの register_scheduled_task.bat をダブルクリック"
+                    "（または PowerShell で tools\\register_scheduled_task.ps1 を実行）。",
+        }
+
+    # ---- OS常駐スケジュール（schedule.json）の保存 ---- #
+    def _os_schedule_save(self, b):
+        """現在の自動実行設定を config/schedule.json に書き出す。"""
+        rule = b.get("frequency")
+        if not rule or not rule.get("kind"):
+            return {"ok": False,
+                    "message": "頻度が未設定です。実行モードを『自動実行』にして頻度を選んでから保存してください。"}
+        plan = self._plan_from(b)
+        plan["mode"] = "auto"
+        conf = {
+            "enabled": True,
+            "anchor": date.today().isoformat(),
+            "rule": rule,
+            "plan": {
+                "models":       plan.get("models", []),
+                "question_set": plan.get("question_set", "set1"),
+                "domain":       plan.get("domain"),
+                "repeat":       plan.get("repeat", {"type": "once"}),
+                "mode":         "auto",
+            },
+            "dry_run": bool(b.get("dry_run")),
+        }
+        if not conf["plan"]["models"]:
+            return {"ok": False, "message": "モデルを1つ以上選択してから保存してください。"}
+        try:
+            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            SCHEDULE_PATH.write_text(
+                json.dumps(conf, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            return {"ok": False, "message": f"保存に失敗しました: {e}"}
+        return {"ok": True,
+                "message": f"OS自動実行の設定を保存しました（{scheduler.describe_rule(rule)}）。"
+                           f"続けて register_scheduled_task.bat でタスク登録してください。",
+                "schedule": self._os_schedule_get()}
+
+    def _os_schedule_disable(self):
+        """schedule.json の enabled を false にする（タスクは残るが実行されない）。"""
+        if not SCHEDULE_PATH.exists():
+            return {"ok": False, "message": "schedule.json がありません。"}
+        try:
+            conf = json.loads(SCHEDULE_PATH.read_text(encoding="utf-8"))
+            conf["enabled"] = False
+            SCHEDULE_PATH.write_text(
+                json.dumps(conf, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            return {"ok": False, "message": f"更新に失敗しました: {e}"}
+        return {"ok": True,
+                "message": "OS自動実行を無効化しました（enabled:false）。"
+                           "タスク自体を消すには unregister_scheduled_task.bat を実行してください。",
+                "schedule": self._os_schedule_get()}
 
     # ---- CSVエクスポート（rowデータ） ---- #
     def _export(self, q):

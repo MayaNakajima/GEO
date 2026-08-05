@@ -58,6 +58,14 @@ button:disabled{opacity:.5;cursor:not-allowed;}
 .msg{margin-top:12px;font-size:13px;min-height:18px;}
 .msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
 
+/* OS自動実行パネル */
+.os-sched{margin-top:22px;padding-top:14px;border-top:1px dashed var(--line);}
+.os-sched .row{margin-top:10px;}
+.hint.warn{color:var(--warn);}
+.hint code,.os-sched code{background:var(--chip);border:1px solid var(--line);
+  border-radius:5px;padding:1px 6px;font-size:12px;color:var(--ink);}
+#os-status{margin-top:10px;}
+
 /* ステータス */
 .status-card{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:14px;}
 .pill{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;

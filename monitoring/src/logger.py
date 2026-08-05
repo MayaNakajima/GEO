@@ -36,6 +36,8 @@ FIELDNAMES = [
     # ↓ 質問セット対応で追加（末尾に追加＝既存列の位置は不変）
     "question_set",      # set1 / set2
     "specificity_tier",  # D1〜D4（set1は空欄）
+    # ↓ 誤検知（false-positive）対策で追加（末尾追加＝既存スキーマ互換）
+    "disclaimer_detected",  # 留保・拒否によりキーワードヒットを無効化したか
 ]
 
 

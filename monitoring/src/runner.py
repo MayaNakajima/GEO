@@ -222,7 +222,11 @@ def run_pass(active_models: list, questions: list, keywords: dict,
             ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             try:
                 answer    = client.ask(model, question["question"])
-                detection = detector.detect(answer, domain=question["axis_domain"])
+                detection = detector.detect(
+                    answer,
+                    domain=question["axis_domain"],
+                    question=question["question"],
+                )
                 mark      = "✓" if detection["detected"] else "✗"
 
                 results.append({
@@ -247,6 +251,7 @@ def run_pass(active_models: list, questions: list, keywords: dict,
                     "entities_found":    ", ".join(detection["entities"]),
                     "urls_found":        ", ".join(detection["urls_found"]),
                     "context_snippet":   detection["context"],
+                    "disclaimer_detected": detection["disclaimer_detected"],
                 })
                 if progress_cb:
                     progress_cb(count, total, label, mark)
@@ -351,6 +356,7 @@ def _dummy_result(run_date: str, question: dict, model: dict) -> dict:
         "entities_found":    "",
         "urls_found":        "",
         "context_snippet":   "",
+        "disclaimer_detected": False,
     }
 
 

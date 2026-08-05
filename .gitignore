@@ -7,6 +7,10 @@
 *.env
 !.env.example
 
+# ----- ユーザ個別のOS常駐スケジュール設定（各自ローカルで生成） -----
+monitoring/config/schedule.json
+!monitoring/config/schedule.json.example
+
 # ----- Python -----
 __pycache__/
 *.py[cod]
@@ -26,6 +30,7 @@ monitoring/data/logs/*
 monitoring/data/reports/*
 monitoring/data/dashboard.html
 monitoring/data/run_log.txt
+monitoring/data/.scheduled.lock
 !monitoring/data/results/.gitkeep
 !monitoring/data/logs/.gitkeep
 !monitoring/data/reports/.gitkeep

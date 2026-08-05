@@ -85,6 +85,28 @@
       <button class="ghost" id="btn-cancel">中断</button>
     </div>
     <div id="msg" class="msg"></div>
+
+    <!-- ============ OS自動実行（アプリを閉じても実行） ============ -->
+    <div class="os-sched">
+      <h2 class="mt">OS自動実行（アプリを閉じても実行）</h2>
+      <p class="hint">
+        上の「自動実行」はこの画面（黒いウィンドウ）を開いている間だけ動きます。
+        画面を閉じても実行するには、上で <b>自動実行＋頻度</b> を設定してから
+        下の「OS自動実行として保存」を押し、続けて
+        <code>register_scheduled_task.bat</code> でWindowsタスクに登録してください。
+      </p>
+      <p class="hint warn">
+        ※ Windowsタスクは<b>スリープ／休止からは自動復帰</b>して実行しますが、
+        <b>完全に電源OFF（シャットダウン）の状態からは起動できません</b>。
+        電源を切る運用なら、PCを「スリープ」にして電源接続のままにしてください。
+      </p>
+      <div class="row">
+        <button class="primary" id="btn-os-save">💾 この設定をOS自動実行として保存</button>
+        <button class="ghost" id="btn-os-disable">OS自動実行を無効化</button>
+      </div>
+      <div id="os-msg" class="msg"></div>
+      <div id="os-status" class="preview"></div>
+    </div>
   </section>
 
   <!-- ============ 実行状況 + レポート ============ -->

@@ -24,6 +24,7 @@ async function init(){
   bindEvents();
   poll(); setInterval(poll, 1500);
   loadReports(); setInterval(loadReports, 8000);
+  loadOsSchedule();
 }
 
 function renderModels(){
@@ -147,6 +148,48 @@ async function doRun(){
 async function stopAuto(){ const d=await api("/api/schedule/stop",{method:"POST"}); setMsg(d.message,"ok"); }
 async function cancel(){ const d=await api("/api/cancel",{method:"POST"}); setMsg(d.message,"ok"); }
 function setMsg(t,cls){ const m=$("#msg"); m.textContent=t; m.className="msg "+(cls||""); }
+function setOsMsg(t,cls){ const m=$("#os-msg"); m.textContent=t; m.className="msg "+(cls||""); }
+
+/* ---------- OS自動実行（schedule.json） ---------- */
+function osPayload(){
+  // OS保存は常に自動実行として保存する（頻度は手動モードでも buildRule で拾う）
+  const p = payload();
+  p.mode = "auto";
+  p.frequency = buildRule();
+  return p;
+}
+async function saveOsSchedule(){
+  if(selectedModels().length===0){ return setOsMsg("モデルを1つ以上選択してください。","err"); }
+  const d = await api("/api/os_schedule/save",{method:"POST",
+    headers:{"Content-Type":"application/json"},body:JSON.stringify(osPayload())});
+  setOsMsg(d.message, d.ok?"ok":"err");
+  renderOsStatus(d.schedule || (await api("/api/os_schedule")));
+}
+async function disableOsSchedule(){
+  const d = await api("/api/os_schedule/disable",{method:"POST"});
+  setOsMsg(d.message, d.ok?"ok":"err");
+  renderOsStatus(d.schedule || (await api("/api/os_schedule")));
+}
+async function loadOsSchedule(){ renderOsStatus(await api("/api/os_schedule")); }
+function renderOsStatus(s){
+  const box = $("#os-status"); if(!box) return;
+  if(!s || !s.exists){
+    box.textContent = "現在の状態：未設定（OS自動実行の設定 schedule.json はまだありません）";
+    return;
+  }
+  if(s.error){ box.textContent = "エラー："+s.error; return; }
+  const lines = [];
+  lines.push("現在の状態：" + (s.enabled ? "有効" : "無効（enabled:false）"));
+  lines.push("頻度：" + (s.desc||""));
+  const pl = s.plan||{};
+  lines.push("モデル：" + ((pl.models||[]).join(", ")||"—") + "／質問セット：" + (pl.question_set||"set1")
+             + (s.dry_run ? "／ドライラン":""));
+  if(s.next && s.next.length){ lines.push("今後の予定："); s.next.forEach(n=>lines.push("  - "+n)); }
+  const rh = s.register_hint;
+  if(rh){ lines.push(""); lines.push("タスク登録：" + rh.note);
+    lines.push("  → 起動時刻の既定は " + (rh.time||"09:00") + "（頻度の時刻に合わせています）"); }
+  box.textContent = lines.join("\n");
+}
 
 /* ---------- 状態ポーリング ---------- */
 function fmtCountdown(s){ if(s==null) return ""; const m=Math.floor(s/60), ss=s%60;
@@ -220,6 +263,8 @@ function bindEvents(){
   $("#btn-cancel").onclick = cancel;
   $("#btn-dash").onclick = ()=> window.open("/api/dashboard","_blank");
   $("#btn-export-all").onclick = ()=> window.open("/api/export?scope=all","_blank");
+  if($("#btn-os-save"))    $("#btn-os-save").onclick = saveOsSchedule;
+  if($("#btn-os-disable")) $("#btn-os-disable").onclick = disableOsSchedule;
 }
 
 init();

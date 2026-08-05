@@ -1,0 +1,18 @@
+{
+  "_comment": "OS常駐スケジュール（タスクスケジューラ）用の設定。このファイルをコピーして schedule.json を作成するか、GUIの『OS自動実行として保存』で自動生成します。schedule.json はユーザ個別設定のため .gitignore 済み。",
+  "_comment_rule": "rule.kind は scheduler.py の頻度ルールと同じ： every_n_days / weekly / biweekly / monthly_day / nth_weekday / nth_business_day / first_business_day / last_business_day。time はタスクスケジューラの起動時刻に合わせる（表示用）。",
+  "enabled": true,
+  "anchor": "2026-08-05",
+  "rule": {
+    "kind": "first_business_day",
+    "time": "09:00"
+  },
+  "plan": {
+    "models": ["claude-sonnet-5"],
+    "question_set": "set1",
+    "domain": null,
+    "repeat": { "type": "once" },
+    "mode": "auto"
+  },
+  "dry_run": false
+}

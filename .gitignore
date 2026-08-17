@@ -31,6 +31,7 @@ monitoring/data/reports/*
 monitoring/data/dashboard.html
 monitoring/data/run_log.txt
 monitoring/data/.scheduled.lock
+monitoring/data/last_run.json
 !monitoring/data/results/.gitkeep
 !monitoring/data/logs/.gitkeep
 !monitoring/data/reports/.gitkeep

@@ -173,6 +173,29 @@ def next_timing(rule: dict, after: datetime, anchor: date,
     return None
 
 
+def previous_timing(rule: dict, before: datetime, anchor: date,
+                    horizon_days: int = 800):
+    """
+    before 以前（<=）の直近の実行タイミング datetime を返す。
+    見つからなければ None。
+
+    キャッチアップ判定用：スリープ等で起動時刻を逃し、後日タスクが
+    起動したときに「本来いつ実行されるはずだったか（直近の過去予定）」を
+    求めるために使う。next_timing の逆向き版。
+    """
+    t = _parse_time(rule.get("time", "09:00"))
+    d = before.date()
+    for _ in range(horizon_days):
+        if d < anchor:
+            break
+        if rule_matches(rule, d, anchor):
+            dt = datetime.combine(d, t)
+            if dt <= before:
+                return dt
+        d -= timedelta(days=1)
+    return None
+
+
 # ------------------------------------------------------------------ #
 # 人間可読の説明（GUI / ログ用）
 # ------------------------------------------------------------------ #

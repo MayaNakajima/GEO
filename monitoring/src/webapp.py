@@ -485,6 +485,7 @@ class Handler(BaseHTTPRequestHandler):
         conf = {
             "enabled": True,
             "anchor": date.today().isoformat(),
+            "catch_up_days": 7,
             "rule": rule,
             "plan": {
                 "models":       plan.get("models", []),

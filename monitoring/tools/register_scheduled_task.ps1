@@ -75,21 +75,70 @@ Write-Host "   実行スク   : $Bat"
 Write-Host "   作業フォルダ: $MonitoringDir"
 Write-Host "============================================================"
 
+# ---- OS電源設定：スリープ解除タイマーを有効化 ----
+# -WakeToRun は電源プランの「スリープ解除タイマーの許可」が有効でないと機能しない。
+# 企業PCやバッテリ駆動では既定で無効なことが多く、これが「スリープ中に実行され
+# ない」主因になる。現在の電源プランに対して AC/DC 両方で有効化しておく（best-effort）。
+try {
+    $SUB_SLEEP = "238C9FA8-0AAD-41ED-83F4-97BE242C8F20"
+    $RTCWAKE   = "BD3B718A-0680-4D9D-8AB2-E1D2B4AC806D"   # Allow wake timers
+    & powercfg /SETACVALUEINDEX SCHEME_CURRENT $SUB_SLEEP $RTCWAKE 1 | Out-Null
+    & powercfg /SETDCVALUEINDEX SCHEME_CURRENT $SUB_SLEEP $RTCWAKE 1 | Out-Null
+    & powercfg /SETACTIVE SCHEME_CURRENT | Out-Null
+    Write-Host "   電源設定   : スリープ解除タイマーを有効化しました（AC/DC）"
+} catch {
+    Write-Host "[注意] スリープ解除タイマーの有効化に失敗しました（権限や環境による）。" -ForegroundColor Yellow
+    Write-Host "  スリープ中の自動起動が効かない場合は、コントロールパネルの電源オプションで" -ForegroundColor Yellow
+    Write-Host "  『スリープ解除タイマーの許可』を『有効』にしてください。" -ForegroundColor Yellow
+}
+
 # ---- タスク定義 ----
 $action = New-ScheduledTaskAction -Execute $Bat -WorkingDirectory $MonitoringDir
 
-$trigger = New-ScheduledTaskTrigger -Daily -At ([datetime]$Time)
+# (1) 毎日 指定時刻の起動トリガー
+$triggerDaily = New-ScheduledTaskTrigger -Daily -At ([datetime]$Time)
+
+# (2) スリープ／休止からの復帰イベントで起動するトリガー
+#     Windows は復帰時に System ログへ Power-Troubleshooter (EventID 1) を記録する。
+#     これを購読することで「実行時刻を逃した後にユーザーがPCを起こした」場合でも
+#     タスクが起動し、run_scheduled.py のキャッチアップ判定で未消化の回を実行できる。
+#     復帰直後はネットワーク等が不安定なため 1 分遅延させる。
+$triggerResume = $null
+try {
+    $evtClass = Get-CimClass -ClassName MSFT_TaskEventTrigger `
+        -Namespace Root/Microsoft/Windows/TaskScheduler -ErrorAction Stop
+    $triggerResume = New-CimInstance -CimClass $evtClass -ClientOnly
+    $triggerResume.Enabled = $true
+    $triggerResume.Subscription =
+        '<QueryList><Query Id="0" Path="System"><Select Path="System">' +
+        '*[System[Provider[@Name=''Microsoft-Windows-Power-Troubleshooter''] and (EventID=1)]]' +
+        '</Select></Query></QueryList>'
+    $triggerResume.Delay = "PT1M"
+} catch {
+    Write-Host "[注意] スリープ復帰トリガーを作成できませんでした。毎日起動のみで登録します。" -ForegroundColor Yellow
+}
+
+if ($triggerResume) {
+    $triggers = @($triggerDaily, $triggerResume)
+    Write-Host "   起動条件   : 毎日 $Time ＋ スリープ復帰時（未実行分を自動キャッチアップ）"
+} else {
+    $triggers = @($triggerDaily)
+    Write-Host "   起動条件   : 毎日 $Time"
+}
 
 # WakeToRun     … スリープ／休止からは自動復帰して実行
 # StartWhenAvailable … 起動時刻を逃した場合（スリープ中など）は復帰後すぐ実行
 # バッテリ関連 … ノートPCでバッテリ駆動でも実行を止めない
 # MultipleInstances IgnoreNew … 前回実行が長引いても二重起動しない
+# RestartCount/Interval … 復帰直後の一時的失敗（ネット未接続など）を数回リトライ
 $settings = New-ScheduledTaskSettingsSet `
     -WakeToRun `
     -StartWhenAvailable `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
     -MultipleInstances IgnoreNew `
+    -RestartCount 3 `
+    -RestartInterval (New-TimeSpan -Minutes 5) `
     -ExecutionTimeLimit (New-TimeSpan -Hours 3)
 
 # ---- 実行アカウント ----
@@ -106,7 +155,7 @@ if ($WhetherLoggedOnOrNot) {
 # ---- 登録 ----
 try {
     Register-ScheduledTask -TaskName $TaskName `
-        -Action $action -Trigger $trigger -Settings $settings -Principal $principal `
+        -Action $action -Trigger $triggers -Settings $settings -Principal $principal `
         -Description "生成AI出現モニタリング（GEO定点観測）の定期自動実行。実行日は config/schedule.json の頻度ルールで判定。" `
         -Force | Out-Null
 } catch {

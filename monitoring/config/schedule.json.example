@@ -1,8 +1,10 @@
 {
   "_comment": "OS常駐スケジュール（タスクスケジューラ）用の設定。このファイルをコピーして schedule.json を作成するか、GUIの『OS自動実行として保存』で自動生成します。schedule.json はユーザ個別設定のため .gitignore 済み。",
   "_comment_rule": "rule.kind は scheduler.py の頻度ルールと同じ： every_n_days / weekly / biweekly / monthly_day / nth_weekday / nth_business_day / first_business_day / last_business_day。time はタスクスケジューラの起動時刻に合わせる（表示用）。",
+  "_comment_catch_up": "catch_up_days は、スリープ等で実行時刻を逃した予定を後から実行（キャッチアップ）する猶予日数。例:7 なら7日以内に取り残した回は復帰時に実行、それより古い回はスキップ。0以下で無制限。未指定なら既定7。",
   "enabled": true,
   "anchor": "2026-08-05",
+  "catch_up_days": 7,
   "rule": {
     "kind": "first_business_day",
     "time": "09:00"

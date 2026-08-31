@@ -73,7 +73,16 @@ class LLMClient:
             messages=[{"role": "user", "content": question}],
         )
         time.sleep(0.5)
-        return response.content[0].text
+        # 拡張思考(extended thinking)対応モデルでは content[0] が ThinkingBlock で
+        # .text を持たないことがある。type=="text" のブロックだけを連結して返す。
+        # （content[0].text 決め打ちだと 'ThinkingBlock' object has no attribute 'text'
+        #   で欠測する事故が起きるため）
+        texts = [
+            getattr(b, "text", "")
+            for b in response.content
+            if getattr(b, "type", None) == "text"
+        ]
+        return "\n".join(t for t in texts if t)
 
     # ------------------------------------------------------------------ #
     # Google Gemini

@@ -25,6 +25,7 @@ from detector import MentionDetector          # noqa: F401 (runner が使用)
 from logger   import ResultLogger
 from reporter import ReportGenerator
 import dashboard
+import insight_report
 
 CONFIG_DIR  = BASE_DIR / "config"
 DATA_DIR    = BASE_DIR / "data"
@@ -172,6 +173,17 @@ def execute_timing(plan: dict, dry_run: bool = False,
         dashboard.render(REPORTS_DIR, DATA_DIR / "dashboard.html")
     except Exception as e:
         print(f"[engine] ダッシュボード生成エラー: {e}")
+
+    # ---- 示唆レポート生成（当タイミングの全回答から。非致命的） ---- #
+    try:
+        all_rows = [row for results in run_results_list for row in results]
+        insight_report.generate_from_rows(
+            all_rows, source_label=f"timing {timing_id}",
+            out_html=DATA_DIR / "insights.html",
+            out_json=REPORTS_DIR / f"insights_{timing_id}.json")
+        print("[engine] 示唆レポート生成: data/insights.html")
+    except Exception as e:
+        print(f"[engine] 示唆レポート生成エラー: {e}")
 
     # ---- Teams 通知（Webhook 設定時のみ） ---- #
     try:

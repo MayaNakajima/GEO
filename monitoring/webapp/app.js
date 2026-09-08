@@ -262,6 +262,7 @@ function bindEvents(){
   $("#btn-stop").onclick = stopAuto;
   $("#btn-cancel").onclick = cancel;
   $("#btn-dash").onclick = ()=> window.open("/api/dashboard","_blank");
+  if($("#btn-insight")) $("#btn-insight").onclick = ()=> window.open("/api/insights","_blank");
   $("#btn-export-all").onclick = ()=> window.open("/api/export?scope=all","_blank");
   if($("#btn-os-save"))    $("#btn-os-save").onclick = saveOsSchedule;
   if($("#btn-os-disable")) $("#btn-os-disable").onclick = disableOsSchedule;

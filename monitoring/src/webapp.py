@@ -38,6 +38,7 @@ import runner
 import engine
 import scheduler
 import dashboard
+import insight_report
 import logger
 
 WEB_DIR       = BASE_DIR / "webapp"
@@ -319,6 +320,20 @@ class Handler(BaseHTTPRequestHandler):
                     dashboard.render(REPORTS_DIR, out)
                 except Exception:
                     pass
+            return self._file(out, "text/html; charset=utf-8")
+        if p == "/api/insights":
+            out = DATA_DIR / "insights.html"
+            # 開くたびに最新の results CSV から再生成（無ければ既存を表示）
+            try:
+                csv_path = insight_report.load_latest_csv()
+                if csv_path:
+                    rows = insight_report.read_csv_rows(csv_path)
+                    insight_report.generate_from_rows(
+                        rows, source_label=csv_path.name, out_html=out)
+            except Exception:
+                pass
+            if not out.exists():
+                return self._json({"error": "no insight report"}, 404)
             return self._file(out, "text/html; charset=utf-8")
         if p == "/api/preview_schedule":
             return self._json(self._preview_schedule(parse_qs(u.query)))

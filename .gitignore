@@ -29,6 +29,7 @@ monitoring/data/results/*
 monitoring/data/logs/*
 monitoring/data/reports/*
 monitoring/data/dashboard.html
+monitoring/data/insights.html
 monitoring/data/run_log.txt
 monitoring/data/.scheduled.lock
 monitoring/data/last_run.json

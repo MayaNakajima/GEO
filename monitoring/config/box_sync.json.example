@@ -1,0 +1,6 @@
+{
+  "_comment": "Box 共有フォルダとの同期設定（src/box_sync.py）。このファイルをコピーして box_sync.json を作成する。box_sync.json はユーザ個別設定のため .gitignore 済みで、Box 側へもコピーされない。",
+  "_comment_box_dir": "box_dir はリポジトリのルート（monitoring の親フォルダ）に相当する Box 上のフォルダ。定期自動実行（run_scheduled）の最後に毎回同期される。手動同期は sync_box.bat。",
+  "enabled": true,
+  "box_dir": "C:\\Users\\<you>\\Box\\<共有フォルダ>\\GEO"
+}

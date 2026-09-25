@@ -10,6 +10,8 @@
 # ----- ユーザ個別のOS常駐スケジュール設定（各自ローカルで生成） -----
 monitoring/config/schedule.json
 !monitoring/config/schedule.json.example
+monitoring/config/box_sync.json
+!monitoring/config/box_sync.json.example
 
 # ----- Python -----
 __pycache__/

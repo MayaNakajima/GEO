@@ -334,7 +334,20 @@ def main():
         release_lock()
 
 
+def sync_box():
+    """Box 共有フォルダとの同期（config/box_sync.json がある場合のみ。非致命的）。"""
+    try:
+        import box_sync
+        box_sync.sync(log=log)
+    except Exception as e:
+        log(f"Box同期でエラーが発生しました（実行結果には影響しません）：{e}")
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    rc = main()
+    # 実行しなかった日も同期する（関係者が Box で手動実行した回の取り込みのため）
+    if "--check" not in sys.argv[1:]:
+        sync_box()
+    sys.exit(rc)
 
 # EOF

@@ -55,7 +55,7 @@ def load_conf(path: Path = CONF_PATH) -> dict | None:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
-    if not raw.get("enabled", True):
+    if not isinstance(raw, dict) or not raw.get("enabled", True):
         return None
     repo = _expand(raw.get("analysis_repo"))
     try:
@@ -81,6 +81,8 @@ def disabled_reason(path: Path = CONF_PATH) -> str:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
         return f"config/{path.name} を読み込めません：{e}"
+    if not isinstance(raw, dict):
+        return f"config/{path.name} の形式が正しくありません（{{ ... }} のオブジェクトにしてください）"
     if not raw.get("enabled", True):
         return f"config/{path.name} で enabled=false になっています"
     return ""
@@ -116,7 +118,8 @@ def regenerate(share: bool = True, conf: dict | None = None, log=None) -> dict:
         res["message"] = "分析ダッシュボード連携は無効です（" + disabled_reason() + "）"
         return res
     if not can_regenerate(conf):
-        res["message"] = f"GEO-analysis が見つかりません（{conf['generate_py']}）"
+        res["message"] = (f"GEO-analysis が見つかりません（{conf['generate_py']}）"
+                          if conf["generate_py"] else "analysis_repo が未設定です")
         _write_log("再生成スキップ: " + res["message"])
         return res
 

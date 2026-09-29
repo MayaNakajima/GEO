@@ -41,12 +41,27 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const PAUSE_KEY = "gc_pause";
+// 検索のペース（Google に短時間で検索が集中すると 403／確認画面で止められるため）
+const WAIT_SEC = 15;          // 記録してから次の検索を開くまでの秒数
+const BREAK_EVERY = 30;       // この件数ごとに自動で進むのを止め、休憩を促す
+const BREAK_MIN = 10;         // 休憩の目安（分）
+const SESSION_KEY = "gc_session";   // {n: 今回の連続記録数, last: 最後に記録した時刻}
+function bumpSession(){
+  let s = {n:0, last:0};
+  try { s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); } catch (e) {}
+  const now = Date.now();
+  if (!s.last || now - s.last > BREAK_MIN * 60 * 1000) s = {n:0, last:0};   // 休憩を挟んだら数え直す
+  s.n = (s.n || 0) + 1; s.last = now;
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
+  return s.n;
+}
 let paused = false, nextUrl = null, timer = null;
 try { paused = localStorage.getItem(PAUSE_KEY) === "1"; } catch (e) {}
 function showPause(){ $("#pause").textContent = "自動で次へ進む：" + (paused ? "OFF" : "ON"); }
 showPause();
 $("#pause").onclick = () => { paused = !paused; try { localStorage.setItem(PAUSE_KEY, paused ? "1" : "0"); } catch (e) {}
   showPause(); if (paused && timer) { clearTimeout(timer); timer = null; $("#prog").textContent += "（一時停止しました）"; } };
+$("#prog").title = `記録後 ${WAIT_SEC} 秒で次の検索へ。${BREAK_EVERY} 件ごとに休憩の案内で止まります。`;
 $("#next").onclick = () => { location.href = nextUrl || "/gc/next"; };
 $("#gui").onclick = () => { location.href = "/"; };
 
@@ -69,10 +84,22 @@ async function save(payload){
   $("#bar").style.width = (r.total ? Math.round(r.done / r.total * 100) : 0) + "%";
   if (!nextUrl) { $("#prog").innerHTML = `<span class="ok">今月の検索チェックはすべて完了しました（${r.done} / ${r.total}）。</span>`;
     $("#next").style.display = "none"; return; }
-  $("#prog").textContent = `進捗 ${r.done} / ${r.total}`;
+  const n = bumpSession();
+  $("#prog").textContent = `進捗 ${r.done} / ${r.total}（今回 ${n} 件目）`;
+  if (n % BREAK_EVERY === 0) {
+    $("#prog").innerHTML += `<br><span class="warn">今回 ${n} 件記録しました。Google に止められないよう、${BREAK_MIN}分ほど休憩してから「次の検索へ」を押してください。</span>`;
+    return;
+  }
   if (!paused && !r.warning) {
-    $("#prog").textContent += "　2秒後に次の検索を開きます…";
-    timer = setTimeout(() => { location.href = nextUrl; }, 2000);
+    let left = WAIT_SEC;
+    const base = $("#prog").textContent;
+    const tick = () => {
+      if (paused) return;
+      if (left <= 0) { location.href = nextUrl; return; }
+      $("#prog").textContent = `${base}　${left}秒後に次の検索を開きます（すぐ進むときは「次の検索へ」）`;
+      left--; timer = setTimeout(tick, 1000);
+    };
+    tick();
   }
 }
 

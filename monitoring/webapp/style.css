@@ -101,5 +101,11 @@ a.bm{display:inline-block;background:var(--accent);color:#04283a;font-weight:700
 .gc-manual{background:var(--chip);border:1px solid var(--warn);border-radius:10px;padding:12px 14px;margin:8px 0;}
 .gc-manual input[type=text],.gc-manual input[type=number]{background:#0b1220;color:var(--ink);border:1px solid var(--line);
   border-radius:6px;padding:5px 7px;}
+.gc-comp{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;}
+.gc-comp summary{cursor:pointer;}
+.gc-comp-form{margin-top:8px;}
+.gc-comp input[type=text]{background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 7px;}
+.sugg{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;
+  cursor:pointer;color:var(--ink);font-size:12px;} .sugg:hover{border-color:var(--accent);}
 .gc-paste{margin-top:10px;} .gc-paste textarea{width:100%;height:70px;background:var(--chip);color:var(--ink);
   border:1px solid var(--line);border-radius:8px;font-size:12px;}

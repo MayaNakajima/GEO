@@ -1,5 +1,6 @@
 {
   "_comment": "Google 検索チェックで、検索結果の表示ドメインから競合を判定する辞書（google_check.py が参照）。competitors.json（AI 回答の社名抽出用）とは別に管理する。group=A は competitors.json の既存競合、B は Claude の回答によく挙がる企業（2026-09-29 時点の定点観測結果から選定）。ドメインは各社公式サイトで確認済み（2026-09-29）。同じドメインを複数社で使う場合は親会社・運営会社の名前にまとめ、note に記載。",
+
   "competitors": [
     {"canonical": "自重堂", "group": "A", "domains": ["jichodo.co.jp"]},
     {"canonical": "ボンマックス", "group": "A", "domains": ["bonmax.co.jp"]},
@@ -47,5 +48,6 @@
     {"canonical": "内田洋行", "group": "B", "domains": ["uchida.co.jp"]},
     {"canonical": "オカムラ", "group": "B", "domains": ["okamura.co.jp"]}
   ],
+
   "_unverified": "公式ドメインを確認できなかったため未登録：アルファピレネ（チクマの ALPHA PIER の可能性）、アルベロ"
 }

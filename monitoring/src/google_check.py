@@ -293,6 +293,147 @@ def state(month=None):
 
 
 # ────────────────────────────────────────────────────────────────
+# 競合辞書の編集（GUI から手動で追加・削除）
+# ────────────────────────────────────────────────────────────────
+COMPETITORS_JSON = CONFIG_DIR / "competitors.json"     # AI 回答の社名抽出用（insight_report.py）
+
+
+def _load_json(path, default):
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def _write_json_lines(path, obj, key, items):
+    """元のキーの順番を保ち、obj[key] の配列だけ「1社1行」で書く（手で読み書きしやすい形を保つ）。"""
+    obj = dict(obj)
+    obj[key] = items
+    parts = []
+    for k, v in obj.items():
+        name = json.dumps(k, ensure_ascii=False)
+        if k == key:
+            body = ",\n".join(f"    {json.dumps(it, ensure_ascii=False)}" for it in v)
+            parts.append(f"  {name}: [\n{body}\n  ]")
+        else:
+            val = json.dumps(v, ensure_ascii=False, indent=2).replace("\n", "\n  ")
+            parts.append(f"  {name}: {val}")
+    tmp = Path(path).with_suffix(".tmp")
+    tmp.write_text("{\n" + ",\n\n".join(parts) + "\n}\n", encoding="utf-8")
+    tmp.replace(path)
+
+
+def _norm_domain(s):
+    h = host_of(s)
+    return h[4:] if h.startswith("www.") else h
+
+
+def competitor_list():
+    d = _load_json(COMPETITOR_DOM, {"competitors": []})
+    ai = {c.get("canonical") for c in _load_json(COMPETITORS_JSON, {}).get("competitors", [])}
+    return [dict(c, in_ai=c.get("canonical") in ai) for c in d.get("competitors", [])]
+
+
+def upsert_competitor(payload):
+    """{canonical, domains:[...], aliases:[...], note, also_ai:bool} を追加・更新する。"""
+    name = _clean(payload.get("canonical"), 60)
+    doms = []
+    for x in payload.get("domains") or []:
+        h = _norm_domain(x)
+        if h and "." in h and h not in doms:
+            doms.append(h)
+    if not name:
+        return {"ok": False, "message": "会社名を入力してください"}
+    if not doms:
+        return {"ok": False, "message": "ドメインを1つ以上入力してください（例：nagaileben.co.jp）"}
+    if any(match_domain(h, own_domains()) for h in doms):
+        return {"ok": False, "message": "自社のドメインは競合に登録できません"}
+    with _lock:
+        d = _load_json(COMPETITOR_DOM, {"competitors": []})
+        items = d.get("competitors", [])
+        # 同じドメインを別の会社が持っていたら、そちらから外す（1ドメイン＝1社）
+        for c in items:
+            if c.get("canonical") != name:
+                c["domains"] = [x for x in c.get("domains", []) if x not in doms]
+        cur = next((c for c in items if c.get("canonical") == name), None)
+        if cur is None:
+            cur = {"canonical": name, "group": "手動", "domains": []}
+            items.append(cur)
+        cur["domains"] = doms
+        note = _clean(payload.get("note"), 120)
+        if note:
+            cur["note"] = note
+        cur.setdefault("added", datetime.now().strftime("%Y-%m-%d"))
+        d["competitors"] = [c for c in items if c.get("domains")]
+        _write_json_lines(COMPETITOR_DOM, d, "competitors", d["competitors"])
+
+        ai_msg = ""
+        if payload.get("also_ai"):
+            aliases = [name] + [_clean(a, 60) for a in (payload.get("aliases") or []) if _clean(a, 60)]
+            j = _load_json(COMPETITORS_JSON, None)
+            if isinstance(j, dict):
+                lst = j.setdefault("competitors", [])
+                e = next((c for c in lst if c.get("canonical") == name), None)
+                if e is None:
+                    lst.append({"canonical": name, "aliases": aliases})
+                else:
+                    e["aliases"] = list(dict.fromkeys((e.get("aliases") or []) + aliases))
+                _write_json_lines(COMPETITORS_JSON, j, "competitors", lst)
+                ai_msg = "（AI 回答の競合辞書にも追加）"
+    n = rejudge_all()
+    return {"ok": True, "message": f"「{name}」を登録しました{ai_msg}。記録済み {n} 件の競合判定を更新しました。"}
+
+
+def delete_competitor(name):
+    with _lock:
+        d = _load_json(COMPETITOR_DOM, {"competitors": []})
+        before = len(d.get("competitors", []))
+        d["competitors"] = [c for c in d.get("competitors", []) if c.get("canonical") != name]
+        if len(d["competitors"]) == before:
+            return {"ok": False, "message": "登録がありません"}
+        _write_json_lines(COMPETITOR_DOM, d, "competitors", d["competitors"])
+    n = rejudge_all()
+    return {"ok": True, "message": f"「{name}」を削除しました。記録済み {n} 件の競合判定を更新しました。"}
+
+
+def rejudge_all():
+    """競合辞書を変えたとき、記録済みの検索結果（上位10件）から競合を判定し直す。手入力の行は変えない。"""
+    n = 0
+    with _lock:
+        for p in sorted(DATA_DIR.glob("google_check_*.csv")):
+            month = p.stem.replace("google_check_", "")
+            recs = load_records(month)
+            for r in recs.values():
+                try:
+                    top = json.loads(r.get("上位10件") or "[]")
+                except ValueError:
+                    continue
+                if not top or r.get("記録方法") == "手入力":
+                    continue
+                _, _, comps, _, _ = judge([{"rank": t[0], "host": t[1]} for t in top], [])
+                r["競合（上位10件内）"] = ";".join(comps)
+                n += 1
+            _write(month, recs)
+    return n
+
+
+def domain_suggestions(month=None, limit=15):
+    """記録済みの上位10件によく出るが、自社でも登録済みの競合でもないドメイン（競合追加の候補）。"""
+    own, comp = own_domains(), competitor_domains()
+    cnt = {}
+    for r in load_records(month or this_month()).values():
+        try:
+            top = json.loads(r.get("上位10件") or "[]")
+        except ValueError:
+            continue
+        for t in top:
+            h = _norm_domain(t[1])
+            if h and not match_domain(h, own) and not match_domain(h, comp):
+                cnt[h] = cnt.get(h, 0) + 1
+    return [{"domain": h, "count": n} for h, n in sorted(cnt.items(), key=lambda x: -x[1])[:limit]]
+
+
+# ────────────────────────────────────────────────────────────────
 # ブックマークレット
 # ────────────────────────────────────────────────────────────────
 def bookmarklet(port):

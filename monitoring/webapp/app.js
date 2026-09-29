@@ -334,7 +334,43 @@ function initGoogleCheck(){
     $("#gc-raw-msg").textContent = r.ok ? `記録しました：${r.term}（自社 ${r.own_rank}）` : (r.message || "記録できませんでした");
     if(r.ok){ $("#gc-raw").value = ""; loadGoogleCheck(); }
   };
+  $("#gcc-save").onclick = saveCompetitor;
+  $("#gc-comp").addEventListener("toggle", ()=>{ if($("#gc-comp").open) loadCompetitors(); });
   loadGoogleCheck(); setInterval(()=> loadGoogleCheck(GC && GC.month), 15000);
+  loadCompetitors();
+}
+/* 競合辞書（検索結果の競合判定） */
+let GCC = null;
+async function loadCompetitors(){
+  try { GCC = await api("/api/gc/competitors" + (GC && GC.month ? `?month=${encodeURIComponent(GC.month)}` : "")); } catch(e){ return; }
+  $("#gc-comp-count").textContent = `（${GCC.competitors.length} 社）`;
+  $("#gc-sugg").innerHTML = GCC.suggestions.length
+    ? GCC.suggestions.map(s => `<span class="sugg" title="クリックでドメイン欄に入れる" onclick="gcSuggest('${gcEsc(s.domain)}')">${gcEsc(s.domain)} ×${s.count}</span>`).join("")
+    : "候補はありません（検索チェックを記録すると、上位10件によく出るドメインがここに出ます）";
+  $("#gc-comp-table").innerHTML = `<thead><tr><th>会社名</th><th>ドメイン</th><th>区分</th><th>AI 回答の辞書</th><th>メモ</th><th></th></tr></thead><tbody>`
+    + GCC.competitors.map((c, i) => `<tr><td>${gcEsc(c.canonical)}</td><td class="small">${gcEsc((c.domains||[]).join(", "))}</td>
+        <td class="small">${gcEsc({A:"既存",B:"Claude の回答から",手動:"手動"+(c.added?`（${c.added}）`:"")}[c.group] || c.group || "")}</td>
+        <td class="small">${c.in_ai ? "登録あり" : "–"}</td><td class="small">${gcEsc(c.note||"")}</td>
+        <td style="white-space:nowrap"><button class="mini" onclick="gcEditComp(${i})">編集</button>
+          <button class="mini" onclick="gcDeleteComp(${i})">削除</button></td></tr>`).join("") + `</tbody>`;
+}
+function gcSuggest(d){ const el = $("#gcc-domains"); el.value = el.value ? el.value + ", " + d : d; $("#gcc-name").focus(); }
+function gcEditComp(i){ const c = GCC.competitors[i];
+  $("#gcc-name").value = c.canonical; $("#gcc-domains").value = (c.domains||[]).join(", "); $("#gcc-note").value = c.note || "";
+  $("#gcc-name").scrollIntoView({behavior:"smooth", block:"center"}); }
+async function saveCompetitor(){
+  const split = v => v.split(/[,、\s]+/).map(x=>x.trim()).filter(Boolean);
+  const body = {canonical: $("#gcc-name").value.trim(), domains: split($("#gcc-domains").value),
+                note: $("#gcc-note").value.trim(), also_ai: $("#gcc-ai").checked, aliases: split($("#gcc-aliases").value)};
+  const r = await api("/api/gc/competitors/save", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  $("#gcc-msg").textContent = r.message || "";
+  if(r.ok){ ["#gcc-name","#gcc-domains","#gcc-note","#gcc-aliases"].forEach(s=>$(s).value=""); $("#gcc-ai").checked=false;
+    loadCompetitors(); loadGoogleCheck(GC && GC.month); }
+}
+async function gcDeleteComp(i){ const c = GCC.competitors[i];
+  if(!confirm(`「${c.canonical}」を競合辞書（検索結果の判定用）から削除しますか？（AI 回答の辞書 competitors.json からは削除しません）`)) return;
+  const r = await api("/api/gc/competitors/delete", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({canonical: c.canonical})});
+  $("#gcc-msg").textContent = r.message || ""; loadCompetitors(); loadGoogleCheck(GC && GC.month);
 }
 async function loadGoogleCheck(month){
   try { GC = await api("/api/gc/state" + (month ? `?month=${encodeURIComponent(month)}` : "")); } catch(e){ return; }

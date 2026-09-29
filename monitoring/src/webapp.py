@@ -331,6 +331,10 @@ class Handler(BaseHTTPRequestHandler):
             st["start_url"] = f"http://{HOST}:{port}/gc/next"
             st["port"] = port
             return self._json(st)
+        if p == "/api/gc/competitors":
+            q = parse_qs(u.query)
+            return self._json({"competitors": google_check.competitor_list(),
+                               "suggestions": google_check.domain_suggestions((q.get("month") or [None])[0])})
 
         if p == "/api/models":
             _, all_models, _ = runner.load_config()
@@ -409,6 +413,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(google_check.save(b, "ブックマークレット"))
         if p == "/api/gc/manual":
             return self._json(google_check.save(b, "手入力"))
+        if p == "/api/gc/competitors/save":
+            return self._json(google_check.upsert_competitor(b))
+        if p == "/api/gc/competitors/delete":
+            return self._json(google_check.delete_competitor(b.get("canonical", "")))
         if p == "/api/gc/delete":
             return self._json(google_check.delete(b.get("term", ""), b.get("month") or None))
         return self._json({"error": "unknown endpoint"}, 404)

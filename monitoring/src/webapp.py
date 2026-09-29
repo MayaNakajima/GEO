@@ -407,7 +407,7 @@ class Handler(BaseHTTPRequestHandler):
                 notice = f"最新化に失敗したため前回生成分を表示しています（{r['message']}）"
         elif conf["regenerate_on_open"]:
             notice = ("GEO-analysis が見つからないため最新化せず、前回生成分を表示しています"
-                      f"（{conf['analysis_repo']}）")
+                      f"（{conf['analysis_repo'] or 'analysis_repo 未設定'}）")
         path, source = analysis_link.resolve_html(conf)
         if path is None:
             return self._html(_analysis_guide_page(

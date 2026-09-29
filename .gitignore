@@ -12,6 +12,8 @@ monitoring/config/schedule.json
 !monitoring/config/schedule.json.example
 monitoring/config/box_sync.json
 !monitoring/config/box_sync.json.example
+monitoring/config/analysis_link.json
+!monitoring/config/analysis_link.json.example
 
 # ----- Python -----
 __pycache__/
@@ -35,6 +37,7 @@ monitoring/data/insights.html
 monitoring/data/run_log.txt
 monitoring/data/.scheduled.lock
 monitoring/data/last_run.json
+monitoring/data/analysis_link.log
 !monitoring/data/results/.gitkeep
 !monitoring/data/logs/.gitkeep
 !monitoring/data/reports/.gitkeep

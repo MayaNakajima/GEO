@@ -324,6 +324,19 @@ def _priority(cell: dict) -> str:
 # ================================================================== #
 # HTML レンダリング（1枚もの・自己完結）
 # ================================================================== #
+def _analysis_link_band() -> str:
+    """分析ダッシュボード（GEO-analysis）へのリンク帯。設定が無ければ空。"""
+    try:
+        import sys
+        _src = str(Path(__file__).parent)
+        if _src not in sys.path:
+            sys.path.insert(0, _src)
+        import analysis_link
+        return analysis_link.link_band_html("light")
+    except Exception:
+        return ""
+
+
 def render_html(report: dict, out_path: Path) -> Path:
     s = report["summary"]
     ex = report["extraction"]
@@ -412,7 +425,7 @@ td.small{{font-size:12px;color:#374151}}
 .muted{{color:var(--muted);font-size:13px}}
 .note{{font-size:12px;color:var(--muted);margin-top:8px}}
 </style></head><body><div class="wrap">
-<h1>GEO 示唆レポート — コンテンツ改善の打ち手</h1>
+{_analysis_link_band()}<h1>GEO 示唆レポート — コンテンツ改善の打ち手</h1>
 <div class="sub">生成: {escape(report['generated_at'])} ／ 対象: {escape(report['source'] or '-')}
 　抽出方式: 辞書ベース（方式a）</div>
 

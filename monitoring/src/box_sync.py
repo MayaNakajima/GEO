@@ -61,7 +61,8 @@ DERIVED_FILES = ["reports/index.json", "reports/trend.json",
 EXCLUDE_DIRS  = {".git", ".claude", "__pycache__", ".venv", "venv",
                  ".ipynb_checkpoints"}
 EXCLUDE_FILES = {"monitoring/.env", "monitoring/config/schedule.json",
-                 "monitoring/config/box_sync.json"}
+                 "monitoring/config/box_sync.json",
+                 "monitoring/config/analysis_link.json"}
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".bak", ".tmp", "~")
 
 # 書き込み途中のファイルを拾わないよう、直近に更新されたものは次回に回す

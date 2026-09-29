@@ -40,6 +40,7 @@ import scheduler
 import dashboard
 import insight_report
 import logger
+import analysis_link
 
 WEB_DIR       = BASE_DIR / "webapp"
 DATA_DIR      = BASE_DIR / "data"
@@ -335,6 +336,10 @@ class Handler(BaseHTTPRequestHandler):
             if not out.exists():
                 return self._json({"error": "no insight report"}, 404)
             return self._file(out, "text/html; charset=utf-8")
+        if p == "/api/analysis":
+            return self._analysis()
+        if p == "/api/analysis_status":
+            return self._json(analysis_link.status())
         if p == "/api/preview_schedule":
             return self._json(self._preview_schedule(parse_qs(u.query)))
         if p == "/api/os_schedule":
@@ -373,6 +378,56 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/os_schedule/disable":
             return self._json(self._os_schedule_disable())
         return self._json({"error": "unknown endpoint"}, 404)
+
+    # ---- 分析ダッシュボード（GEO-analysis の analysis.html） ---- #
+    def _html(self, html: str):
+        body = html.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _analysis(self):
+        """最新化してから analysis.html を返す。失敗時は前回生成分＋注記、無ければ案内ページ。"""
+        conf = analysis_link.load_conf()
+        if conf is None:
+            return self._html(_analysis_guide_page(
+                "分析ダッシュボード連携が無効です",
+                analysis_link.disabled_reason(),
+                ["config/analysis_link.json.example をコピーして config/analysis_link.json を作成し、"
+                 "analysis_repo（GEO-analysis の場所）と fallback_html（Box 上の analysis.html）を設定してください。"]))
+        notice = ""
+        if conf["regenerate_on_open"] and analysis_link.can_regenerate(conf):
+            JOBS._log("分析ダッシュボードを最新化しています…")
+            r = analysis_link.regenerate(share=True, conf=conf, log=JOBS._log)
+            if not r["ok"]:
+                notice = f"最新化に失敗したため前回生成分を表示しています（{r['message']}）"
+        elif conf["regenerate_on_open"]:
+            notice = ("GEO-analysis が見つからないため最新化せず、前回生成分を表示しています"
+                      f"（{conf['analysis_repo']}）")
+        path, source = analysis_link.resolve_html(conf)
+        if path is None:
+            return self._html(_analysis_guide_page(
+                "分析ダッシュボード（analysis.html）が見つかりません",
+                "ローカルにも Box にも analysis.html がありません。",
+                [f"GEO-analysis の場所（analysis_repo）: {conf['analysis_repo'] or '未設定'}",
+                 f"Box 上の analysis.html（fallback_html）: {conf['fallback_html'] or '未設定'}",
+                 "運用者PC：GEO-analysis で「更新して開く.bat」（または python generate.py）を一度実行して生成してください。",
+                 "メンバーPC：Box 同期アプリで GEO-analysis フォルダが同期されているか確認し、"
+                 "パスが違う場合は config/analysis_link.json の fallback_html を直してください。"]))
+        try:
+            html = path.read_text(encoding="utf-8")
+        except Exception as e:
+            return self._html(_analysis_guide_page(
+                "analysis.html を読み込めませんでした", f"{path}：{e}", []))
+        if notice:
+            if source == "box":
+                notice += "｜表示中：Box 版"
+            html = _insert_banner(html, notice)
+        return self._html(html)
 
     # ---- プラン整形 ---- #
     def _plan_from(self, b):
@@ -582,6 +637,33 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+
+def _insert_banner(html: str, text: str) -> str:
+    """レスポンス HTML の先頭（<body> 直後）に注記バナーを差し込む。"""
+    import re
+    from html import escape
+    banner = ('<div style="position:sticky;top:0;z-index:99999;background:#fef3c7;color:#78350f;'
+              'border-bottom:2px solid #f59e0b;padding:10px 20px;font:600 14px/1.5 '
+              '&quot;Segoe UI&quot;,Meiryo,sans-serif">⚠ ' + escape(text) + '</div>')
+    m = re.search(r"<body[^>]*>", html, re.IGNORECASE)
+    if m:
+        return html[:m.end()] + banner + html[m.end():]
+    return banner + html
+
+
+def _analysis_guide_page(title: str, reason: str, steps: list) -> str:
+    from html import escape
+    items = "".join(f"<li>{escape(s)}</li>" for s in steps)
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<title>分析ダッシュボード｜案内</title></head>
+<body style="margin:0;background:#f7f8fa;color:#1a2233;font-family:'Segoe UI',Meiryo,sans-serif">
+<div style="max-width:760px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px 28px">
+<h1 style="font-size:20px;margin:0 0 10px">🔎 {escape(title)}</h1>
+<p style="color:#b45309">{escape(reason)}</p>
+<h2 style="font-size:15px">対処</h2><ul style="line-height:1.9">{items}</ul>
+<p style="color:#6b7280;font-size:13px">設定ファイル：monitoring/config/analysis_link.json ／ 詳細は 運用手順書_v1.md「K. 分析ダッシュボード」</p>
+</div></body></html>"""
 
 
 def _find_port(start=8765, tries=20):

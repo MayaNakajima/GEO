@@ -25,6 +25,7 @@ async function init(){
   poll(); setInterval(poll, 1500);
   loadReports(); setInterval(loadReports, 8000);
   loadOsSchedule();
+  loadAnalysisStatus(); setInterval(loadAnalysisStatus, 30000);
 }
 
 function renderModels(){
@@ -240,6 +241,49 @@ function renderHist(hist){
   }).join("") || '<tr><td colspan="7" class="muted">履歴なし</td></tr>';
 }
 
+/* ---------- 分析ダッシュボード（GEO-analysis） ---------- */
+const ANALYSIS_LABEL = "🔎 分析ダッシュボードを開く（関係者向け）";
+let ANALYSIS = null;       // /api/analysis_status の結果
+let analysisBusy = false;
+async function loadAnalysisStatus(){
+  const btn = $("#btn-analysis"), box = $("#analysis-status");
+  if(!btn) return;
+  try{ ANALYSIS = await api("/api/analysis_status"); }
+  catch(e){ ANALYSIS = {available:false, reason:"状態を取得できませんでした"}; }
+  if(analysisBusy) return;
+  const a = ANALYSIS;
+  btn.disabled = !a.available;
+  if(!a.available){
+    btn.title = "利用できません：" + (a.reason||"");
+    box.textContent = "分析ダッシュボード：無効（" + (a.reason||"") + "）";
+    return;
+  }
+  const src = {local:"ローカル（GEO-analysis）", box:"Box 共有版"}[a.source] || "未生成";
+  btn.title = a.can_regenerate && a.regenerate_on_open
+    ? "最新の結果で analysis.html を再生成してから開きます（数十秒かかることがあります）"
+    : "Box 上の analysis.html を開きます（このPCでは生成しません）";
+  box.textContent = "分析ダッシュボード：最終生成 " + (a.mtime||"—") + "／表示：" + src
+    + (a.can_regenerate ? "" : "（このPCでは生成しません）");
+}
+function openAnalysis(){
+  if(analysisBusy || !ANALYSIS || !ANALYSIS.available) return;
+  const btn = $("#btn-analysis");
+  const w = window.open("/api/analysis","_blank");
+  analysisBusy = true;
+  btn.disabled = true;
+  btn.textContent = "⏳ 生成中…（新しいタブに表示されます）";
+  const started = Date.now();
+  const done = ()=>{ clearInterval(t); analysisBusy = false;
+    btn.textContent = ANALYSIS_LABEL; loadAnalysisStatus(); };
+  const t = setInterval(()=>{
+    let loaded = false;
+    try{ loaded = !w || w.closed ||
+      (w.location.pathname==="/api/analysis" && w.document.readyState!=="loading"); }
+    catch(e){ loaded = true; }
+    if(loaded || Date.now()-started > 5*60*1000) done();
+  }, 700);
+}
+
 /* ---------- イベント ---------- */
 function bindEvents(){
   $("#sel-all").onclick = ()=>{ $$("#models input").forEach(x=>x.checked=true); updateModelCount(); };
@@ -263,6 +307,7 @@ function bindEvents(){
   $("#btn-cancel").onclick = cancel;
   $("#btn-dash").onclick = ()=> window.open("/api/dashboard","_blank");
   if($("#btn-insight")) $("#btn-insight").onclick = ()=> window.open("/api/insights","_blank");
+  if($("#btn-analysis")) $("#btn-analysis").onclick = openAnalysis;
   $("#btn-export-all").onclick = ()=> window.open("/api/export?scope=all","_blank");
   if($("#btn-os-save"))    $("#btn-os-save").onclick = saveOsSchedule;
   if($("#btn-os-disable")) $("#btn-os-disable").onclick = disableOsSchedule;

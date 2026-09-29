@@ -1,0 +1,12 @@
+{
+  "_comment": "分析ダッシュボード（GEO-analysis の analysis.html）との連携設定（src/analysis_link.py）。このファイルをコピーして analysis_link.json を作成する。analysis_link.json は個人環境のパスを含むため .gitignore 済みで、Box 側へもコピーされない。",
+  "_comment_paths": "パス中の %USERPROFILE% などの環境変数は展開される。analysis_repo が無い PC（メンバー）では生成せず fallback_html（Box 上の analysis.html）を表示するだけになる。",
+  "enabled": true,
+  "analysis_repo": "C:\\Users\\<you>\\Documents\\GitHub\\GEO-analysis",
+  "generate_py": "generate.py",
+  "analysis_html": "analysis.html",
+  "fallback_html": "%USERPROFILE%\\Box\\<共有フォルダ>\\GEO-analysis\\analysis.html",
+  "regenerate_on_open": true,
+  "regenerate_after_scheduled_run": true,
+  "timeout_sec": 180
+}

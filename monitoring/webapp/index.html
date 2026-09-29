@@ -138,6 +138,68 @@
     <table class="hist"><thead><tr><th>日時</th><th>モード</th><th>回数</th><th>平均</th><th>SD</th><th>安定性</th><th></th></tr></thead>
       <tbody id="hist"></tbody></table>
   </section>
+
+  <!-- ============ Google 検索チェック（毎月・全問） ============ -->
+  <section class="panel wide" id="gc-panel">
+    <h2>Google 検索チェック（毎月・全問）</h2>
+    <p class="hint">設問文と観測キーワードを <b>人が Google で検索</b> し、検索結果ページでブックマークレット「GEO記録」を押すと、
+      上位10件のドメインと AI による概要を記録して、自動で次の検索に進みます。プログラムから Google に検索を送ることはしません。
+      結果は分析ダッシュボードの「Google参考値」タブに反映されます。</p>
+    <div class="row">
+      <label>対象月 <select id="gc-month"></select></label>
+      <span id="gc-progress" class="muted"></span>
+      <button class="mini" id="gc-reload">↻ 更新</button>
+    </div>
+    <div class="bar" style="margin-top:8px"><div id="gc-bar" class="bar-in"></div></div>
+
+    <div class="gc-steps">
+      <div class="gc-step">
+        <h3>① 初回だけ：ブックマークレットを登録</h3>
+        <p class="hint">Chrome のブックマークバーを表示し（Ctrl+Shift+B）、下のボタンを<b>ブックマークバーへドラッグ</b>してください。
+          シークレットウィンドウでもブックマークバーが表示されるようにしておきます。</p>
+        <p><a id="gc-bm" class="bm" href="#" onclick="return false">🔖 GEO記録</a>
+          <button class="mini" id="gc-bm-copy">コードをコピー</button></p>
+        <p class="hint">※ ドラッグできない場合：「コードをコピー」→ ブックマークを新規作成し、URL 欄に貼り付け（名前は GEO記録）。
+          この GUI の番号（ポート <span id="gc-port"></span>）が変わったときは登録し直してください。</p>
+      </div>
+      <div class="gc-step">
+        <h3>② 検索を始める・続きから再開</h3>
+        <p class="hint"><b>Chrome のシークレットウィンドウ</b>（Ctrl+Shift+N・Google 未ログイン）で次の URL を開きます。
+          まだ記録していない最初の語の検索結果が開きます。</p>
+        <p><code id="gc-start"></code> <button class="mini" id="gc-start-copy">URL をコピー</button></p>
+        <h3>③ 1件ごとの操作</h3>
+        <p class="hint">検索結果を目で確認（AI による概要が「もっと見る」なら開く）→ ブックマークバーの「GEO記録」を押す →
+          記録画面で結果を確認 → 2秒後に次の検索が自動で開きます（記録画面で一時停止できます）。</p>
+      </div>
+    </div>
+
+    <h3>一覧 <label class="chk" style="display:inline-flex;margin-left:10px"><input type="checkbox" id="gc-only-todo"> 未記録のみ表示</label></h3>
+    <div id="gc-manual" class="gc-manual hidden"></div>
+    <div class="gc-table-wrap"><table class="hist" id="gc-table"></table></div>
+    <details class="gc-comp" id="gc-comp"><summary><b>競合辞書（検索結果の競合判定）</b> <span class="muted" id="gc-comp-count"></span></summary>
+      <p class="hint">検索結果の上位10件に、ここに登録したドメインのサイトが出ると「競合」として記録します。
+        登録・削除すると、記録済みの検索結果の競合判定も自動でやり直します（手入力の記録は変わりません）。</p>
+      <div class="row gc-comp-form">
+        <label>会社名 <input type="text" id="gcc-name" size="16" placeholder="例：ナガイレーベン"></label>
+        <label>ドメイン <input type="text" id="gcc-domains" size="30" placeholder="例：nagaileben.co.jp（複数はカンマ区切り）"></label>
+        <label>メモ <input type="text" id="gcc-note" size="16"></label>
+      </div>
+      <div class="row gc-comp-form">
+        <label class="chk"><input type="checkbox" id="gcc-ai"> AI 回答の競合辞書（competitors.json）にも追加</label>
+        <label>表記ゆれ <input type="text" id="gcc-aliases" size="24" placeholder="例：NAGAILEBEN（カンマ区切り）"></label>
+        <button class="primary" id="gcc-save">追加・更新</button> <span id="gcc-msg" class="muted"></span>
+      </div>
+      <h3>追加の候補：上位10件によく出るが未登録のドメイン <span class="muted">（対象月の記録から）</span></h3>
+      <div id="gc-sugg" class="muted small"></div>
+      <h3>登録済み</h3>
+      <div class="gc-table-wrap" style="max-height:300px"><table class="hist" id="gc-comp-table"></table></div>
+    </details>
+    <details class="gc-paste"><summary class="muted">記録画面に移動できなかったとき：貼り付けで記録</summary>
+      <p class="hint">ブックマークレットを押すと、データはクリップボードにもコピーされます。ここに貼り付けて「記録」を押してください。</p>
+      <textarea id="gc-raw" placeholder="ここに貼り付け（Ctrl+V）"></textarea>
+      <button class="mini" id="gc-raw-save">記録</button> <span id="gc-raw-msg" class="muted"></span>
+    </details>
+  </section>
 </main>
 <script src="/app.js"></script>
 </body>

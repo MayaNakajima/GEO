@@ -86,3 +86,26 @@ table.hist th,table.hist td{padding:6px 8px;border-bottom:1px solid var(--line);
 table.hist th{color:var(--sub);font-weight:600;}
 a.exp{color:var(--accent);text-decoration:none;font-size:12px;}
 .analysis-status{margin-top:6px;white-space:pre-line;}
+
+/* Google 検索チェック */
+.panel.wide{grid-column:1/-1;}
+.gc-steps{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px;}
+@media(max-width:920px){.gc-steps{grid-template-columns:1fr}}
+.gc-step p{margin:6px 0;}
+a.bm{display:inline-block;background:var(--accent);color:#04283a;font-weight:700;text-decoration:none;
+  border-radius:9px;padding:8px 16px;cursor:grab;}
+.gc-step code{background:var(--chip);border:1px solid var(--line);border-radius:5px;padding:3px 8px;font-size:12px;color:var(--ink);}
+.gc-table-wrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px;}
+#gc-table td.done{color:var(--good);} #gc-table td.todo{color:var(--sub);}
+#gc-table td .kind{font-size:11px;color:var(--sub);}
+.gc-manual{background:var(--chip);border:1px solid var(--warn);border-radius:10px;padding:12px 14px;margin:8px 0;}
+.gc-manual input[type=text],.gc-manual input[type=number]{background:#0b1220;color:var(--ink);border:1px solid var(--line);
+  border-radius:6px;padding:5px 7px;}
+.gc-comp{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;}
+.gc-comp summary{cursor:pointer;}
+.gc-comp-form{margin-top:8px;}
+.gc-comp input[type=text]{background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 7px;}
+.sugg{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;
+  cursor:pointer;color:var(--ink);font-size:12px;} .sugg:hover{border-color:var(--accent);}
+.gc-paste{margin-top:10px;} .gc-paste textarea{width:100%;height:70px;background:var(--chip);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;font-size:12px;}

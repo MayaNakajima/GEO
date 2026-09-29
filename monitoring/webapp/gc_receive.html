@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google 検索チェック｜記録</title>
+<style>
+  body{margin:0;background:#f5f7fa;color:#1f2a37;font-family:"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;}
+  .box{max-width:720px;margin:40px auto;background:#fff;border:1px solid #dde3ea;border-radius:12px;padding:22px 26px;}
+  h1{font-size:18px;margin:0 0 12px;} .muted{color:#5f6b7a;font-size:13px;}
+  .ok{color:#1a7f4b;font-weight:700;} .ng{color:#c0392b;font-weight:700;} .warn{color:#b7791f;font-weight:700;}
+  table{border-collapse:collapse;margin:10px 0;font-size:14px;} td,th{padding:6px 10px;border-bottom:1px solid #dde3ea;text-align:left;}
+  .bar{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin:12px 0 4px;}
+  .bar>div{height:100%;background:#1d4f91;width:0;}
+  button{border:1px solid #1d4f91;background:#1d4f91;color:#fff;border-radius:8px;padding:9px 16px;font-size:14px;cursor:pointer;margin-right:8px;}
+  button.ghost{background:#fff;color:#1d4f91;}
+  textarea{width:100%;height:90px;font-size:12px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🔎 Google 検索チェック｜記録</h1>
+  <div id="msg" class="muted">記録しています…</div>
+  <div id="detail"></div>
+  <div class="bar"><div id="bar"></div></div>
+  <div id="prog" class="muted"></div>
+  <p style="margin-top:16px">
+    <button id="next">次の検索へ</button>
+    <button id="pause" class="ghost">自動で次へ進む：ON</button>
+    <button id="gui" class="ghost">GUI を開く</button>
+  </p>
+  <div id="paste" style="display:none">
+    <p class="muted">ブックマークレットのデータが届いていません。検索結果ページでブックマークレットを押すと、
+      データはクリップボードにもコピーされます。移動がうまくいかなかったときは、ここに貼り付けて「記録」を押してください。</p>
+    <textarea id="raw" placeholder="ここに貼り付け（Ctrl+V）"></textarea>
+    <button id="save-raw">記録</button>
+  </div>
+</div>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const PAUSE_KEY = "gc_pause";
+let paused = false, nextUrl = null, timer = null;
+try { paused = localStorage.getItem(PAUSE_KEY) === "1"; } catch (e) {}
+function showPause(){ $("#pause").textContent = "自動で次へ進む：" + (paused ? "OFF" : "ON"); }
+showPause();
+$("#pause").onclick = () => { paused = !paused; try { localStorage.setItem(PAUSE_KEY, paused ? "1" : "0"); } catch (e) {}
+  showPause(); if (paused && timer) { clearTimeout(timer); timer = null; $("#prog").textContent += "（一時停止しました）"; } };
+$("#next").onclick = () => { location.href = nextUrl || "/gc/next"; };
+$("#gui").onclick = () => { location.href = "/"; };
+
+async function save(payload){
+  let r;
+  try {
+    r = await (await fetch("/api/gc/save", {method:"POST", headers:{"Content-Type":"application/json"},
+                                           body: JSON.stringify(payload)})).json();
+  } catch (e) { $("#msg").innerHTML = `<span class="ng">保存できませんでした（GUI が起動しているか確認してください）：${esc(e)}</span>`; return; }
+  if (!r.ok) { $("#msg").innerHTML = `<span class="ng">${esc(r.message || "保存できませんでした")}</span>`; return; }
+  nextUrl = r.next_url;
+  $("#msg").innerHTML = `<span class="ok">記録しました</span>：${esc(r.term)}`
+    + (r.listed ? "" : ` <span class="warn">（今月の検索リストにない語です。記録はしましたが集計には使われません）</span>`);
+  $("#detail").innerHTML = `<table>
+      <tr><th>自社の順位</th><td>${r.own_rank === "圏外" ? "上位10件に自社なし" : esc(r.own_rank) + " 位"}</td></tr>
+      <tr><th>AI による概要</th><td>${esc(r.aio)}${r.aio === "あり" ? `（自社の引用：${esc(r.aio_own)}）` : ""}</td></tr>
+      <tr><th>上位10件内の競合</th><td>${esc(r.competitors || "なし")}</td></tr>
+      <tr><th>読み取った件数</th><td>${esc(r.n_results)} 件</td></tr></table>`
+    + (r.warning ? `<p class="warn">⚠ ${esc(r.warning)}</p>` : "");
+  $("#bar").style.width = (r.total ? Math.round(r.done / r.total * 100) : 0) + "%";
+  if (!nextUrl) { $("#prog").innerHTML = `<span class="ok">今月の検索チェックはすべて完了しました（${r.done} / ${r.total}）。</span>`;
+    $("#next").style.display = "none"; return; }
+  $("#prog").textContent = `進捗 ${r.done} / ${r.total}`;
+  if (!paused && !r.warning) {
+    $("#prog").textContent += "　2秒後に次の検索を開きます…";
+    timer = setTimeout(() => { location.href = nextUrl; }, 2000);
+  }
+}
+
+const raw = decodeURIComponent((location.hash || "").slice(1));
+history.replaceState(null, "", location.pathname);   // 再読み込みで二重に記録しないよう # 以降を消す
+if (raw) {
+  let data = null;
+  try { data = JSON.parse(raw); } catch (e) {}
+  if (data) save(data); else { $("#msg").innerHTML = `<span class="ng">データを読み取れませんでした</span>`; $("#paste").style.display = "block"; }
+} else {
+  $("#msg").textContent = "データがありません。";
+  $("#paste").style.display = "block";
+}
+$("#save-raw").onclick = () => { let d; try { d = JSON.parse($("#raw").value); } catch (e) { alert("貼り付けた内容を読み取れません"); return; }
+  $("#paste").style.display = "none"; save(d); };
+</script>
+</body>
+</html>

@@ -32,6 +32,7 @@ venv/
 monitoring/data/results/*
 monitoring/data/logs/*
 monitoring/data/reports/*
+monitoring/data/google_check/*
 monitoring/data/dashboard.html
 monitoring/data/insights.html
 monitoring/data/run_log.txt
@@ -41,6 +42,7 @@ monitoring/data/analysis_link.log
 !monitoring/data/results/.gitkeep
 !monitoring/data/logs/.gitkeep
 !monitoring/data/reports/.gitkeep
+!monitoring/data/google_check/.gitkeep
 
 # ----- アーカイブ / バイナリ（予算表・zip 等） -----
 *.zip

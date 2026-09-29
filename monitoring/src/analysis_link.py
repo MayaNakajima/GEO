@@ -11,7 +11,8 @@ config.json の share_dirs＝Box へコピーする）。
 
 設定: config/analysis_link.json（個人環境のパスを含むため .gitignore 済み・Box へも反映しない。
       雛形は analysis_link.json.example）
-  ファイルが無い、または enabled=false なら関連機能はすべて無効。
+  ファイルが無い場合（Box 上のコピーやメンバー PC）は既定値（DEFAULT_CONF）で動き、生成はせず
+  Box の GEO-analysis/analysis.html を開くだけ。enabled=false なら無効。
 
 使い方:
     python src/analysis_link.py            # 状態を表示
@@ -35,6 +36,18 @@ CONF_PATH = BASE_DIR / "config" / "analysis_link.json"
 LOG_PATH  = BASE_DIR / "data" / "analysis_link.log"
 
 DEFAULT_TIMEOUT_SEC = 180
+
+# config/analysis_link.json が無いときの既定値（Box 上のコピーやメンバー PC の GUI）。
+# 生成はせず、Box 共有の analysis.html を開くだけ（Box の GEO-analysis フォルダにある古い generate.py で
+# 作り直して、運用者 PC が生成した最新版を上書きしないため）。
+DEFAULT_CONF = {
+    "enabled": True,
+    "analysis_repo": "",
+    "fallback_html": r"%USERPROFILE%\Box\事業推進Div□\DX推進課\生成AI\GEO-analysis\analysis.html",
+    "regenerate_on_open": False,
+    "regenerate_after_scheduled_run": False,
+    "timeout_sec": DEFAULT_TIMEOUT_SEC,
+}
 TAIL_CHARS = 600
 
 # GUI の二重クリックや自動実行と重なっても generate.py を同時に走らせない
@@ -48,11 +61,9 @@ def _expand(p) -> Path | None:
 
 
 def load_conf(path: Path = CONF_PATH) -> dict | None:
-    """設定を読み込みパスを解決する。無い／enabled=false／読めない場合は None。"""
+    """設定を読み込みパスを解決する。ファイルが無ければ DEFAULT_CONF。enabled=false／読めない場合は None。"""
     try:
-        if not path.exists():
-            return None
-        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw = json.loads(path.read_text(encoding="utf-8")) if path.exists() else dict(DEFAULT_CONF)
     except Exception:
         return None
     if not isinstance(raw, dict) or not raw.get("enabled", True):
@@ -76,7 +87,7 @@ def load_conf(path: Path = CONF_PATH) -> dict | None:
 def disabled_reason(path: Path = CONF_PATH) -> str:
     """load_conf() が None を返す理由（GUI のツールチップ用）。"""
     if not path.exists():
-        return f"config/{path.name} がありません（{path.name}.example をコピーして作成してください）"
+        return ""
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:
@@ -164,7 +175,7 @@ def resolve_html(conf: dict | None = None) -> tuple[Path | None, str | None]:
     if conf is None:
         return None, None
     if conf["analysis_html"] and conf["analysis_html"].is_file():
-        return conf["analysis_html"], "local"
+        return conf["analysis_html"], ("local" if can_regenerate(conf) else "box")
     if conf["fallback_html"] and conf["fallback_html"].is_file():
         return conf["fallback_html"], "box"
     return None, None

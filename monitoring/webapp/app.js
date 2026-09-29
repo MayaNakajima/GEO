@@ -26,6 +26,7 @@ async function init(){
   loadReports(); setInterval(loadReports, 8000);
   loadOsSchedule();
   loadAnalysisStatus(); setInterval(loadAnalysisStatus, 30000);
+  initGoogleCheck();
 }
 
 function renderModels(){
@@ -311,6 +312,123 @@ function bindEvents(){
   $("#btn-export-all").onclick = ()=> window.open("/api/export?scope=all","_blank");
   if($("#btn-os-save"))    $("#btn-os-save").onclick = saveOsSchedule;
   if($("#btn-os-disable")) $("#btn-os-disable").onclick = disableOsSchedule;
+}
+
+/* ---------- Google 検索チェック ---------- */
+let GC = null;
+const gcEsc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function copyText(t, btn){
+  try { await navigator.clipboard.writeText(t); const o = btn.textContent; btn.textContent = "コピーしました"; setTimeout(()=>btn.textContent = o, 1500); }
+  catch(e){ prompt("コピーしてください", t); }
+}
+function initGoogleCheck(){
+  if(!$("#gc-panel")) return;
+  $("#gc-reload").onclick = ()=> loadGoogleCheck();
+  $("#gc-month").onchange = ()=> loadGoogleCheck($("#gc-month").value);
+  $("#gc-only-todo").onchange = renderGoogleCheck;
+  $("#gc-bm-copy").onclick = e => GC && copyText(GC.bookmarklet, e.target);
+  $("#gc-start-copy").onclick = e => GC && copyText(GC.start_url, e.target);
+  $("#gc-raw-save").onclick = async ()=>{
+    let d; try { d = JSON.parse($("#gc-raw").value); } catch(e){ $("#gc-raw-msg").textContent = "貼り付けた内容を読み取れません"; return; }
+    const r = await api("/api/gc/save", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(d)});
+    $("#gc-raw-msg").textContent = r.ok ? `記録しました：${r.term}（自社 ${r.own_rank}）` : (r.message || "記録できませんでした");
+    if(r.ok){ $("#gc-raw").value = ""; loadGoogleCheck(); }
+  };
+  $("#gcc-save").onclick = saveCompetitor;
+  $("#gc-comp").addEventListener("toggle", ()=>{ if($("#gc-comp").open) loadCompetitors(); });
+  loadGoogleCheck(); setInterval(()=> loadGoogleCheck(GC && GC.month), 15000);
+  loadCompetitors();
+}
+/* 競合辞書（検索結果の競合判定） */
+let GCC = null;
+async function loadCompetitors(){
+  try { GCC = await api("/api/gc/competitors" + (GC && GC.month ? `?month=${encodeURIComponent(GC.month)}` : "")); } catch(e){ return; }
+  $("#gc-comp-count").textContent = `（${GCC.competitors.length} 社）`;
+  $("#gc-sugg").innerHTML = GCC.suggestions.length
+    ? GCC.suggestions.map(s => `<span class="sugg" title="クリックでドメイン欄に入れる" onclick="gcSuggest('${gcEsc(s.domain)}')">${gcEsc(s.domain)} ×${s.count}</span>`).join("")
+    : "候補はありません（検索チェックを記録すると、上位10件によく出るドメインがここに出ます）";
+  $("#gc-comp-table").innerHTML = `<thead><tr><th>会社名</th><th>ドメイン</th><th>区分</th><th>AI 回答の辞書</th><th>メモ</th><th></th></tr></thead><tbody>`
+    + GCC.competitors.map((c, i) => `<tr><td>${gcEsc(c.canonical)}</td><td class="small">${gcEsc((c.domains||[]).join(", "))}</td>
+        <td class="small">${gcEsc({A:"既存",B:"Claude の回答から",手動:"手動"+(c.added?`（${c.added}）`:"")}[c.group] || c.group || "")}</td>
+        <td class="small">${c.in_ai ? "登録あり" : "–"}</td><td class="small">${gcEsc(c.note||"")}</td>
+        <td style="white-space:nowrap"><button class="mini" onclick="gcEditComp(${i})">編集</button>
+          <button class="mini" onclick="gcDeleteComp(${i})">削除</button></td></tr>`).join("") + `</tbody>`;
+}
+function gcSuggest(d){ const el = $("#gcc-domains"); el.value = el.value ? el.value + ", " + d : d; $("#gcc-name").focus(); }
+function gcEditComp(i){ const c = GCC.competitors[i];
+  $("#gcc-name").value = c.canonical; $("#gcc-domains").value = (c.domains||[]).join(", "); $("#gcc-note").value = c.note || "";
+  $("#gcc-name").scrollIntoView({behavior:"smooth", block:"center"}); }
+async function saveCompetitor(){
+  const split = v => v.split(/[,、\s]+/).map(x=>x.trim()).filter(Boolean);
+  const body = {canonical: $("#gcc-name").value.trim(), domains: split($("#gcc-domains").value),
+                note: $("#gcc-note").value.trim(), also_ai: $("#gcc-ai").checked, aliases: split($("#gcc-aliases").value)};
+  const r = await api("/api/gc/competitors/save", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  $("#gcc-msg").textContent = r.message || "";
+  if(r.ok){ ["#gcc-name","#gcc-domains","#gcc-note","#gcc-aliases"].forEach(s=>$(s).value=""); $("#gcc-ai").checked=false;
+    loadCompetitors(); loadGoogleCheck(GC && GC.month); }
+}
+async function gcDeleteComp(i){ const c = GCC.competitors[i];
+  if(!confirm(`「${c.canonical}」を競合辞書（検索結果の判定用）から削除しますか？（AI 回答の辞書 competitors.json からは削除しません）`)) return;
+  const r = await api("/api/gc/competitors/delete", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({canonical: c.canonical})});
+  $("#gcc-msg").textContent = r.message || ""; loadCompetitors(); loadGoogleCheck(GC && GC.month);
+}
+async function loadGoogleCheck(month){
+  try { GC = await api("/api/gc/state" + (month ? `?month=${encodeURIComponent(month)}` : "")); } catch(e){ return; }
+  const sel = $("#gc-month");
+  sel.innerHTML = GC.months.map(m => `<option value="${m}">${m}</option>`).join("");
+  sel.value = GC.month;
+  $("#gc-progress").textContent = `記録済み ${GC.done} / ${GC.total} 件（設問文とキーワード。重複する語は1件）`;
+  $("#gc-bar").style.width = (GC.total ? Math.round(GC.done / GC.total * 100) : 0) + "%";
+  $("#gc-bm").setAttribute("href", GC.bookmarklet);
+  $("#gc-port").textContent = GC.port;
+  $("#gc-start").textContent = GC.start_url;
+  renderGoogleCheck();
+}
+function renderGoogleCheck(){
+  if(!GC) return;
+  const only = $("#gc-only-todo").checked;
+  const rows = GC.items.map((it, i) => ({it, i})).filter(x => !only || !x.it.done);
+  $("#gc-table").innerHTML = `<thead><tr><th>状態</th><th>検索語</th><th>設問ID</th><th>自社順位</th><th>AI による概要</th>
+      <th>上位10件内の競合</th><th>記録</th><th></th></tr></thead><tbody>`
+    + rows.map(({it, i}) => `<tr>
+      <td class="${it.done ? "done" : "todo"}">${it.done ? "✔ 記録済み" : "未記録"}</td>
+      <td>${gcEsc(it.term)}<div class="kind">${gcEsc(it.kinds.join("・"))}｜${gcEsc(it.domain_label)}</div></td>
+      <td class="small">${gcEsc(it.qids.join(" "))}</td>
+      <td>${it.done ? (it.own_rank === "圏外" ? "圏外" : gcEsc(it.own_rank) + " 位") : "–"}</td>
+      <td>${it.done ? gcEsc(it.aio) + (it.aio === "あり" ? `（自社引用 ${gcEsc(it.aio_own)}）` : "") : "–"}</td>
+      <td class="small">${gcEsc(it.competitors || (it.done ? "なし" : "–"))}</td>
+      <td class="small">${gcEsc(it.observed_at)}${it.method ? `<br>${gcEsc(it.method)}` : ""}</td>
+      <td style="white-space:nowrap"><a class="exp" href="${gcEsc(it.url)}" target="_blank" rel="noopener">検索を開く</a>
+        <button class="mini" onclick="gcManual(${i})">手入力</button>
+        ${it.done && GC.month ? `<button class="mini" onclick="gcDelete(${i})">取消</button>` : ""}</td></tr>`).join("")
+    + `</tbody>`;
+}
+function gcManual(i){
+  const it = GC.items[i], box = $("#gc-manual");
+  box.classList.remove("hidden");
+  box.innerHTML = `<b>手入力：</b>${gcEsc(it.term)}
+    <div class="row" style="margin-top:8px">
+      <label>自社の最高順位 <input type="text" id="gm-rank" size="4" placeholder="1〜10 / 圏外"></label>
+      <label class="chk"><input type="checkbox" id="gm-aio"> AI による概要あり</label>
+      <label class="chk"><input type="checkbox" id="gm-aio-own"> 概要に自社の引用あり</label></div>
+    <div class="row" style="margin-top:6px">
+      <label>上位10件内の競合 <input type="text" id="gm-comp" size="30" placeholder="例：ナガイレーベン;フォーク"></label>
+      <label>メモ <input type="text" id="gm-memo" size="30"></label>
+      <button class="primary" id="gm-save">記録</button> <button class="ghost" id="gm-cancel">閉じる</button></div>`;
+  $("#gm-cancel").onclick = ()=> box.classList.add("hidden");
+  $("#gm-save").onclick = async ()=>{
+    const body = {q: it.term, own_rank: $("#gm-rank").value.trim() || "圏外", aio: $("#gm-aio").checked,
+                  aio_own: $("#gm-aio-own").checked, competitors: $("#gm-comp").value, memo: $("#gm-memo").value};
+    const r = await api("/api/gc/manual", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+    if(r.ok){ box.classList.add("hidden"); loadGoogleCheck(GC.month); } else alert(r.message || "記録できませんでした");
+  };
+  box.scrollIntoView({behavior:"smooth", block:"center"});
+}
+async function gcDelete(i){
+  const it = GC.items[i];
+  if(!confirm(`「${it.term}」の ${GC.month} の記録を取り消しますか？（もう一度検索して記録し直せます）`)) return;
+  await api("/api/gc/delete", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({term: it.term, month: GC.month})});
+  loadGoogleCheck(GC.month);
 }
 
 init();

@@ -85,3 +85,4 @@ table.hist{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
 table.hist th,table.hist td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;}
 table.hist th{color:var(--sub);font-weight:600;}
 a.exp{color:var(--accent);text-decoration:none;font-size:12px;}
+.analysis-status{margin-top:6px;white-space:pre-line;}

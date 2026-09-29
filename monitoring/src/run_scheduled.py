@@ -66,6 +66,9 @@ STALE_LOCK_SEC = 6 * 60 * 60
 # schedule.json の "catch_up_days" で上書き可能。0以下で無制限。
 DEFAULT_CATCH_UP_DAYS = 7
 
+# main() で確定したドライラン有無（後処理＝分析ダッシュボード再生成の要否判定に使う）
+_RUN_STATE = {"dry_run": "--dry-run" in sys.argv[1:]}
+
 
 # ------------------------------------------------------------------ #
 # ログ
@@ -247,6 +250,7 @@ def main():
     now    = datetime.now()
     today  = date.today()
     dry    = bool(args.dry_run or conf.get("dry_run", False))
+    _RUN_STATE["dry_run"] = dry
     try:
         catch_up_days = int(conf.get("catch_up_days", DEFAULT_CATCH_UP_DAYS))
     except Exception:
@@ -343,11 +347,29 @@ def sync_box():
         log(f"Box同期でエラーが発生しました（実行結果には影響しません）：{e}")
 
 
+def regenerate_analysis():
+    """分析ダッシュボード（GEO-analysis の analysis.html）を再生成し Box へ反映する。
+    config/analysis_link.json がある場合のみ。非致命的（失敗しても自動実行は成功扱い）。"""
+    if _RUN_STATE["dry_run"]:
+        return
+    try:
+        import analysis_link
+        conf = analysis_link.load_conf()
+        if conf is None or not conf["regenerate_after_scheduled_run"]:
+            return
+        r = analysis_link.regenerate(share=True, conf=conf)
+        log(f"分析ダッシュボード再生成：{'成功' if r['ok'] else '失敗（実行結果には影響しません）'}"
+            f"／{r['message']}／{r['elapsed_sec']}秒")
+    except Exception as e:
+        log(f"分析ダッシュボード再生成でエラーが発生しました（実行結果には影響しません）：{e}")
+
+
 if __name__ == "__main__":
     rc = main()
     # 実行しなかった日も同期する（関係者が Box で手動実行した回の取り込みのため）
     if "--check" not in sys.argv[1:]:
         sync_box()
+        regenerate_analysis()
     sys.exit(rc)
 
 # EOF

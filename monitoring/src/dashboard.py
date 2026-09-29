@@ -18,6 +18,19 @@ def _load(path: Path, default):
         return default
 
 
+def _analysis_link_band() -> str:
+    """分析ダッシュボード（GEO-analysis）へのリンク帯。設定が無ければ空。"""
+    try:
+        import sys
+        _src = str(Path(__file__).parent)
+        if _src not in sys.path:
+            sys.path.insert(0, _src)
+        import analysis_link
+        return analysis_link.link_band_html("dark")
+    except Exception:
+        return ""
+
+
 def render(reports_dir: Path, out_path: Path) -> Path:
     reports_dir = Path(reports_dir)
     index = _load(reports_dir / "index.json", [])
@@ -32,6 +45,7 @@ def render(reports_dir: Path, out_path: Path) -> Path:
     payload = json.dumps(data, ensure_ascii=False)
 
     html = _TEMPLATE.replace("/*__DATA__*/", payload)
+    html = html.replace("<!--__ANALYSIS_LINK__-->", _analysis_link_band())
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(html, encoding="utf-8")
@@ -123,6 +137,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   <h1>🔍 AI出現モニタリング ダッシュボード</h1>
   <div class="sub">株式会社オンワードコーポレートデザイン｜GEO定点観測</div>
 </header>
+<!--__ANALYSIS_LINK__-->
 <div class="tabs">
   <div class="tab active" data-t="trend">時系列トレンド</div>
   <div class="tab" data-t="timing">タイミング詳細（ブレ）</div>

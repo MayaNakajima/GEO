@@ -41,6 +41,7 @@ import dashboard
 import insight_report
 import logger
 import analysis_link
+import google_check
 
 WEB_DIR       = BASE_DIR / "webapp"
 DATA_DIR      = BASE_DIR / "data"
@@ -269,6 +270,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _redirect(self, url: str):
+        self.send_response(302)
+        self.send_header("Location", url)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def _file(self, path: Path, ctype: str):
         if not path.exists():
             self._json({"error": "not found"}, 404)
@@ -303,6 +311,26 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(WEB_DIR / "app.js", "application/javascript; charset=utf-8")
         if p == "/style.css":
             return self._file(WEB_DIR / "style.css", "text/css; charset=utf-8")
+
+        # ---- Google 検索チェック（ブックマークレットの受け取り・次の検索へ） ---- #
+        if p == "/gc/receive":
+            return self._file(WEB_DIR / "gc_receive.html", "text/html; charset=utf-8")
+        if p == "/gc/next":
+            st = google_check.state()
+            if st["next_url"]:
+                return self._redirect(st["next_url"])
+            return self._html(_analysis_guide_page(
+                f"{st['month']} の検索チェックはすべて記録済みです（{st['done']} / {st['total']}）",
+                "おつかれさまでした。", ["定点観測 GUI の「Google 検索チェック」で結果を確認できます。",
+                                       "分析ダッシュボードの「Google参考値」タブに反映されます（再生成後）。"]))
+        if p == "/api/gc/state":
+            q = parse_qs(u.query)
+            st = google_check.state((q.get("month") or [None])[0])
+            port = self.server.server_address[1]
+            st["bookmarklet"] = google_check.bookmarklet(port)
+            st["start_url"] = f"http://{HOST}:{port}/gc/next"
+            st["port"] = port
+            return self._json(st)
 
         if p == "/api/models":
             _, all_models, _ = runner.load_config()
@@ -377,6 +405,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(self._os_schedule_save(b))
         if p == "/api/os_schedule/disable":
             return self._json(self._os_schedule_disable())
+        if p == "/api/gc/save":
+            return self._json(google_check.save(b, "ブックマークレット"))
+        if p == "/api/gc/manual":
+            return self._json(google_check.save(b, "手入力"))
+        if p == "/api/gc/delete":
+            return self._json(google_check.delete(b.get("term", ""), b.get("month") or None))
         return self._json({"error": "unknown endpoint"}, 404)
 
     # ---- 分析ダッシュボード（GEO-analysis の analysis.html） ---- #

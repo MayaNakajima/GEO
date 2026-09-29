@@ -52,10 +52,13 @@ DATA_PATTERNS = [
     ("reports", "report_*.json"),
     ("reports", "timing_*.json"),
     ("reports", "insights_*.json"),
+    ("google_check", "google_check_*.csv"),
 ]
 # 集計ファイル（GitHub 側で作り直したものを Box に上書き）
 DERIVED_FILES = ["reports/index.json", "reports/trend.json",
                  "dashboard.html", "insights.html"]
+# 追記・上書きされるデータ（GitHub 側＝検索チェックを記録した PC の内容で Box を上書き）
+DERIVED_GLOBS = [("google_check", "google_check_*.csv")]
 
 # プログラム反映の対象外（リポジトリルートからの相対パス）
 EXCLUDE_DIRS  = {".git", ".claude", "__pycache__", ".venv", "venv",
@@ -170,8 +173,8 @@ def sync(dry: bool = False, log=print, conf_path: Path = CONF_PATH) -> dict:
     for rel in pulled:
         log(f"Box同期: Box側の結果を取り込み → {rel}")
 
-    # 2) 取り込みがあれば集計を作り直す
-    if pulled and not dry:
+    # 2) 定点観測の結果を取り込んだときだけ集計を作り直す（検索チェックの CSV は集計に関係しない）
+    if any(not r.startswith("google_check/") for r in pulled) and not dry:
         _rebuild(log)
 
     # 3) プログラム・資料 GitHub → Box
@@ -180,7 +183,10 @@ def sync(dry: bool = False, log=print, conf_path: Path = CONF_PATH) -> dict:
     # 4) 結果データ GitHub → Box
     pushed = _add_missing(DATA_DIR, box_data, dry)
     derived = []
-    for rel in DERIVED_FILES:
+    rels = list(DERIVED_FILES)
+    for sub, pat in DERIVED_GLOBS:
+        rels += [f"{sub}/{p.name}" for p in sorted((DATA_DIR / sub).glob(pat))]
+    for rel in rels:
         src, dst = DATA_DIR / rel, box_data / rel
         if src.exists() and not (dst.exists() and filecmp.cmp(src, dst, shallow=False)):
             _copy(src, dst, dry)

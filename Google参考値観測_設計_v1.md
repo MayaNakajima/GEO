@@ -1,7 +1,7 @@
 # Google検索 参考値観測｜設計書（v1）
 ## 株式会社オンワードコーポレートデザイン ／ 生成AI出現モニタリング 追加機能
 
-作成日：2026-09-29 ／ 状態：**フェーズ1（GSC 取り込み＋ダッシュボード表示）実装済み**・フェーズ2（検索チェック）未実装
+作成日：2026-09-29 ／ 状態：**フェーズ1（GSC 取り込み＋表示）・フェーズ2（検索チェック＋表示）実装済み**
 対象リポジトリ：`GEO`（monitoring：設問マスタ・検索チェック）／`GEO-analysis`（GSC 取り込み・分析ダッシュボード表示）
 関連資料：`monitoring/AI_Citation_Monitoring_Design_v8.md`、`GEO-analysis/docs/分析アプリ_仕様書_v1.md`、キーワード設問セット案 v3（CSV）
 
@@ -155,15 +155,27 @@
 ```
 人の操作は **②確認 ＋ ③1クリック** のみ。
 
+### 5-0. 【フェーズ2 実装】実装メモ
+- GUI（`monitoring/src/webapp.py`）：画面下に「Google 検索チェック」パネル。`/gc/next`（次の未記録の語の Google 検索へリダイレクト）、
+  `/gc/receive`（受け取りページ `webapp/gc_receive.html`）、`/api/gc/state`・`/api/gc/save`・`/api/gc/manual`・`/api/gc/delete`。
+- 本体：`monitoring/src/google_check.py`（検索リスト作成・判定・保存）。ブックマークレット本体は `webapp/bookmarklet.js`（GUI のポートを埋め込んで配布）。
+- **検索結果のリンク先 URL は Google 側で暗号化されている**（`/goto?url=…`）ため、表示されているドメイン（`cite` の表示）で判定する。
+  AI による概要の引用元も表示ドメインで取る。2026-09-29 に実際の検索結果ページ（「白衣 選び方」）で抜き出しを確認。
+- 競合ドメインは competitors.json（AI 回答の社名抽出用）に混ぜず、**`config/google_competitor_domains.json`** に分けた（既存22社＋Claude の回答によく挙がる企業。公式サイトで確認済み、未確認2社は未登録）。
+- 検索リストは設問文136＋観測キーワード133＝**269語**（重複する語は1つにまとめ、設問IDを複数持つ）。
+- ダッシュボード：「判定に使う Google の値」を選べる（既定＝検索チェック（観測キーワード）→ 未記録なら GSC）。
+  検索チェックで上位10件に自社がない＝「順位を上げる」。一覧に検索チェック（キーワード／設問文）の順位・AI による概要・上位10件の競合、
+  設問詳細に月別の記録（上位10件つき）、⑤に「検索チェック：AI による概要（Google が引用しているサイト）」を表示。
+
 ### 5-2. ブックマークレットが抜き出す項目
 | 項目 | 内容 |
 |---|---|
 | 検索語 | 実際に検索された語（URL の q から取得） |
-| 自然検索の上位10件 | 順位・URL・タイトル（広告・「他の人はこちらも質問」は除外） |
+| 自然検索の上位10件 | 順位・表示ドメイン・タイトル（広告・「関連する質問」は除外。リンク先 URL は暗号化されているため取らない） |
 | AI Overview | 有無、引用リンクの URL 一覧 |
 | 取得日時・ブラウザ情報 | 記録用 |
 
-- データの受け渡しは、受け取りページの URL の `#` 以降に入れる方式（外部サーバーには送らない。PC 内で完結）。
+- データの受け渡しは、受け取りページの URL の `#` 以降に入れる方式（外部サーバーには送らない。PC 内で完結）。クリップボードにもコピーし、移動できない場合は GUI に貼り付けて記録できる。
 - Google の画面構造が変わると抜き出しに失敗することがある。**0件しか取れなかった場合は受け取りページで警告**し、「手入力で記録」画面（同じ項目のフォーム）に切り替えられるようにする。
 - 自動で Google に検索を送ることはしない（利用規約違反・CAPTCHA のため）。検索するのは常に人。
 
@@ -175,7 +187,7 @@
 
 ### 5-4. 判定（ツール）
 - **自社判定**：URL のドメインが自社ドメイン（detection_keywords.json の domain_urls ＋ onward-raffiria.shop）なら自社。自社最高順位・自社URL を記録。
-- **競合判定**：competitors.json に各社の `domains` を追加し（例：ナガイレーベン → nagaileben.co.jp）、上位10件の中の競合を記録する。
+- **競合判定**：`config/google_competitor_domains.json`（例：ナガイレーベン → nagaileben.co.jp）で、上位10件の中の競合を記録する。
 - 上位10件に自社がなければ「圏外（11位以下）」。
 
 ### 5-5. 出力 `monitoring/data/google_check/google_check_YYYY-MM.csv`
@@ -293,12 +305,12 @@ Google が先に動き、Claude が後から追いかけるのが想定。
 | GEO | `monitoring/config/google_keywords.csv` | 設問マスタ（新規） | フェーズ1 済 |
 | GEO-analysis | `gsc_reader.py` | GSC の xlsx 読み込み（新規） | フェーズ1 済 |
 | GEO-analysis | `generate.py`、`config.json` | 「Google参考値」タブ（4象限・設問一覧・推移・AI Overview・取り込み状況）、ホーム1行、`action_notes` | フェーズ1 済 |
-| GEO | `monitoring/config/competitors.json` | 各社に `domains` を追加 | フェーズ2 |
-| GEO | `monitoring/src/google_check.py` | 検索リスト作成・受け取り・判定・保存（新規） | フェーズ2 |
-| GEO | `monitoring/src/webapp.py`、`monitoring/webapp/*` | 「検索チェック」タブ、受け取りページ | フェーズ2 |
-| GEO | `monitoring/webapp/bookmarklet.js` | ブックマークレット本体と登録手順ページ | フェーズ2 |
-| GEO | `monitoring/src/box_sync.py` | 同期対象に `data/google_check/` を追加 | フェーズ2 |
-| GEO-analysis | `generate.py` | Google参考値タブの横軸に検索チェックを追加 | フェーズ2 |
+| GEO | `monitoring/config/google_competitor_domains.json` | 競合の公式ドメイン辞書（新規） | フェーズ2 済 |
+| GEO | `monitoring/src/google_check.py` | 検索リスト作成・受け取り・判定・保存（新規） | フェーズ2 済 |
+| GEO | `monitoring/src/webapp.py`、`monitoring/webapp/*` | 「検索チェック」パネル、受け取りページ | フェーズ2 済 |
+| GEO | `monitoring/webapp/bookmarklet.js` | ブックマークレット本体（登録は GUI のパネル） | フェーズ2 済 |
+| GEO | `monitoring/src/box_sync.py` | 同期対象に `data/google_check/` を追加（GitHub 側で Box を上書き） | フェーズ2 済 |
+| GEO-analysis | `gsc_reader.py`、`generate.py` | 検索チェックの読み込み、判定に使う値の切り替え、一覧・詳細・AI Overview への表示 | フェーズ2 済 |
 
 - 既存の `results_*.csv` の列は**変更しない**（GEO-analysis が読んでいるため）。
 - 実装の順番（案）：①設問マスタ・GSC取り込み → ②ダッシュボード（GSCのみで表示）→ ③検索チェック → ④ダッシュボードに検索チェックを追加。①②だけでも先に使い始められる。
@@ -326,3 +338,4 @@ Google が先に動き、Claude が後から追いかけるのが想定。
 | 2026-09-29 | v1 | 初版（壁打ちの結論をもとに作成） |
 | 2026-09-29 | v1.1 | レビュー結果を §0 に反映。フェーズ1 を実装：GSC 取り込みを GEO-analysis の `gsc_reader.py` に置く形に変更（§4-2・§4-3・§8）、4象限はマス目表示（§6-1） |
 | 2026-09-29 | v1.2 | ダッシュボードを「やることリスト」に作り直し（§6-0 を追加）。判定名を「AI向けに直す／あと一歩／順位を上げる／検索チェック待ち／維持」に変更 |
+| 2026-09-29 | v1.3 | フェーズ2（検索チェック）を実装（§5-0 実装メモ）。競合ドメインを別ファイルに、判定の既定を「検索チェック（KW）→ GSC」に |

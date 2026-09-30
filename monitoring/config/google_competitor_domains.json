@@ -1,5 +1,5 @@
 {
-  "_comment": "Google 検索チェックで、検索結果の表示ドメインから競合を判定する辞書（google_check.py が参照）。competitors.json（AI 回答の社名抽出用）とは別に管理する。group=A は competitors.json の既存競合、B は Claude の回答によく挙がる企業（2026-09-29 時点の定点観測結果から選定）。ドメインは各社公式サイトで確認済み（2026-09-29）。同じドメインを複数社で使う場合は親会社・運営会社の名前にまとめ、note に記載。",
+  "_comment": "Google 検索チェックで、検索結果の表示ドメインから競合を判定する辞書（google_check.py が参照）。competitors.json（AI 回答の社名抽出用）とは別に管理する。group=A は competitors.json の既存競合、B は Claude の回答によく挙がる企業（2026-09-29 時点の定点観測結果から選定）。ドメインは各社公式サイトで確認済み（2026-09-29）。同じドメインを複数社で使う場合は親会社・運営会社の名前にまとめ、note に記載。 group=C は検索チェック（2026-09）の上位10件によく出た企業（2026-09-30 確認）。media は情報を載せる先（PR TIMES・YouTube 等）で、競合には数えない。",
 
   "competitors": [
     {"canonical": "自重堂", "group": "A", "domains": ["jichodo.co.jp"]},
@@ -8,7 +8,7 @@
     {"canonical": "アイトス", "group": "A", "domains": ["aitoz.co.jp"]},
     {"canonical": "トンボ", "group": "A", "domains": ["tombow.gr.jp", "tombow-shop.jp"], "note": "医療ブランド「キラク」も tombow.gr.jp"},
     {"canonical": "チトセ", "group": "A", "domains": ["uniform-chitose.com", "eshop-chitose.com"]},
-    {"canonical": "KAZEN（カーシー）", "group": "A", "domains": ["kazen.co.jp", "ap-ron.jp"], "note": "ap-ron.jp は旧ブランド アプロン"},
+    {"canonical": "KAZEN", "group": "A", "domains": ["kazen.co.jp", "ap-ron.jp"], "note": "ap-ron.jp は旧ブランド アプロン。カーシー（カーシーカシマ）は別会社"},
     {"canonical": "ナガイレーベン", "group": "A", "domains": ["nagaileben.co.jp"]},
     {"canonical": "モンブラン", "group": "A", "domains": ["scmb.co.jp"], "note": "住商モンブラン"},
     {"canonical": "チクマ", "group": "A", "domains": ["chikuma.co.jp"]},
@@ -46,8 +46,48 @@
     {"canonical": "寅壱", "group": "B", "domains": ["toraichi.com", "toraichi-shop.com"]},
     {"canonical": "クロダルマ", "group": "B", "domains": ["kurodaruma.jp"]},
     {"canonical": "内田洋行", "group": "B", "domains": ["uchida.co.jp"]},
-    {"canonical": "オカムラ", "group": "B", "domains": ["okamura.co.jp"]}
+    {"canonical": "オカムラ", "group": "B", "domains": ["okamura.co.jp"]},
+    {"canonical": "ユニフォームネクスト", "group": "C", "domains": ["uniformnext.com"], "note": "作業服・事務服・医療・飲食ユニフォームの通販"},
+    {"canonical": "THS-白衣NET", "group": "C", "domains": ["ths-net.jp"], "note": "白衣・ナース服・スクラブの通販（ティーエッチエス）"},
+    {"canonical": "セブンデックス", "group": "C", "domains": ["sevendex.com"], "note": "ブランドデザイン・UX/UI"},
+    {"canonical": "アルファユニ", "group": "C", "domains": ["alpha-uni.com"], "note": "医療用スクラブ・白衣の刺繍・プリント"},
+    {"canonical": "ダイイチ", "group": "C", "domains": ["un-daiichi.co.jp", "e-uniform.jp"], "note": "企業ユニフォーム（e-uniform.jp は同社の通販）"},
+    {"canonical": "東京ユニフォーム", "group": "C", "domains": ["tokyouniform.co.jp"], "note": "オリジナルユニフォーム製作"},
+    {"canonical": "WANSIE（ワンジー）", "group": "C", "domains": ["wansie.tokyo"], "note": "つなぎ・ワークウェア、企業ユニフォーム"},
+    {"canonical": "ブランディングテクノロジー", "group": "C", "domains": ["branding-t.co.jp"], "note": "ブランディング・Web 制作"},
+    {"canonical": "グッドパッチ", "group": "C", "domains": ["goodpatch.com"], "note": "UI/UX・ブランドエクスペリエンスデザイン"},
+    {"canonical": "カーシーカシマ", "group": "C", "domains": ["karsee.com"], "note": "オフィスユニフォーム（ブランド KARSEE・カーシー）。KAZEN とは別会社"},
+    {"canonical": "レイロ", "group": "C", "domains": ["reiro.co.jp"], "note": "ブランディング戦略・クリエイティブ"},
+    {"canonical": "UNIX TOKYO", "group": "C", "domains": ["unixtokyo.jp"], "note": "ホテル・飲食・クリニック等のオーダーユニフォーム"},
+    {"canonical": "ユニファースト", "group": "C", "domains": ["unifast.co.jp"], "note": "オリジナルノベルティ・OEM"},
+    {"canonical": "メディカルウェアジャパン", "group": "C", "domains": ["medical-wear.jp"], "note": "白衣・スクラブのカスタマイズ通販（ワーキングハセガワ）"},
+    {"canonical": "アンファミエ", "group": "C", "domains": ["infirmiere.co.jp"], "note": "看護師向け白衣・ナースグッズ通販（ナースステージ）"},
+    {"canonical": "プロフェッサーズラウンド", "group": "C", "domains": ["professors-round.com"], "note": "白衣・スクラブのセレクトショップ"},
+    {"canonical": "UMEカンパニー", "group": "C", "domains": ["umecompany.jp"], "note": "企業・スポーツユニフォーム"},
+    {"canonical": "丸十服装", "group": "C", "domains": ["maluju-fuku.co.jp"], "note": "企業ユニフォーム・作業服"},
+    {"canonical": "販促花子", "group": "C", "domains": ["hi-ad.jp"], "note": "名入れノベルティ・販促品の通販（チャンスメーカー）"},
+    {"canonical": "パドルデザインカンパニー", "group": "C", "domains": ["paddledesign.co.jp"], "note": "ブランディング・CI/VI・空間デザイン"},
+    {"canonical": "オーダーユニフォームカンパニー（OUC）", "group": "C", "domains": ["ouc-harada.jp"], "note": "オリジナル制服・作業服のオーダー（ハラダ）"},
+    {"canonical": "パラドックス", "group": "C", "domains": ["prdx.co.jp"], "note": "コーポレート・インナー・空間ブランディング"}
   ],
 
-  "_unverified": "公式ドメインを確認できなかったため未登録：アルファピレネ（チクマの ALPHA PIER の可能性）、アルベロ"
+  "_unverified": "公式ドメインを確認できなかったため未登録：アルファピレネ（チクマの ALPHA PIER の可能性）、アルベロ",
+
+  "media": [
+    {"name": "PR TIMES", "domains": ["prtimes.jp", "prtimes.com"], "note": "プレスリリース配信"},
+    {"name": "PR EDGE", "domains": ["predge.jp"], "note": "広告・プロモーション事例メディア（PR TIMES 運営）"},
+    {"name": "YouTube", "domains": ["youtube.com"], "note": "動画"},
+    {"name": "note", "domains": ["note.com"], "note": "ブログ・記事投稿"},
+    {"name": "Instagram", "domains": ["instagram.com"], "note": "SNS"},
+    {"name": "Baseconnect", "domains": ["baseconnect.in"], "note": "企業データベース"},
+    {"name": "店舗デザイン.COM", "domains": ["tenpodesign.com"], "note": "店舗デザイン会社のマッチング"},
+    {"name": "レディクル", "domains": ["readycrew.jp"], "note": "BtoB 外注先マッチング"},
+    {"name": "イプロス", "domains": ["ipros.com"], "note": "BtoB 製品・企業情報"},
+    {"name": "Metoree", "domains": ["metoree.com"], "note": "BtoB 製品・企業の比較・ランキング"},
+    {"name": "比較ビズ", "domains": ["biz.ne.jp"], "note": "外注先の見積もり比較"},
+    {"name": "クロスデザイナー", "domains": ["xdesigner.jp"], "note": "デザイナーのマッチング"},
+    {"name": "Yahoo!知恵袋", "domains": ["detail.chiebukuro.yahoo.co.jp"], "note": "Q&A"},
+    {"name": "マイナビ（新卒）", "domains": ["job.mynavi.jp"], "note": "就職情報"},
+    {"name": "doda", "domains": ["doda.jp"], "note": "転職情報"}
+  ]
 }

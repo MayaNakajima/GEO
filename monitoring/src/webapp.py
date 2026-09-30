@@ -416,7 +416,7 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/gc/competitors/save":
             return self._json(google_check.upsert_competitor(b))
         if p == "/api/gc/competitors/delete":
-            return self._json(google_check.delete_competitor(b.get("canonical", "")))
+            return self._json(google_check.delete_competitor(b.get("canonical", ""), b.get("kind") or "comp"))
         if p == "/api/gc/delete":
             return self._json(google_check.delete(b.get("term", ""), b.get("month") or None))
         return self._json({"error": "unknown endpoint"}, 404)

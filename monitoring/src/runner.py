@@ -252,7 +252,12 @@ def run_pass(active_models: list, questions: list, keywords: dict,
                     "urls_found":        ", ".join(detection["urls_found"]),
                     "context_snippet":   detection["context"],
                     "disclaimer_detected": detection["disclaimer_detected"],
+                    # JSONL ログだけに残る付帯情報（CSV は FIELDNAMES の列だけを書く）
+                    "response_meta":     getattr(client, "last_meta", {}) or {},
                 })
+                if (getattr(client, "last_meta", {}) or {}).get("empty_answer"):
+                    m = client.last_meta
+                    mark = f"空（{m.get('stop_reason')}／出力 {m.get('output_tokens')}/{m.get('max_tokens')}）"
                 if progress_cb:
                     progress_cb(count, total, label, mark)
                 else:

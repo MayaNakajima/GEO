@@ -40,6 +40,8 @@ class LLMClient:
         }
         if provider not in dispatch:
             raise ValueError(f"Unknown provider: {provider}")
+        # 直近の呼び出しの付帯情報（終了理由など）。runner が JSONL ログに残す（CSV の列は変えない）
+        self.last_meta = {}
         return dispatch[provider](model, question)
 
     # ------------------------------------------------------------------ #
@@ -82,7 +84,18 @@ class LLMClient:
             for b in response.content
             if getattr(b, "type", None) == "text"
         ]
-        return "\n".join(t for t in texts if t)
+        answer = "\n".join(t for t in texts if t)
+        # 空の回答の原因を後から確認できるよう、終了理由とブロックの種類を残す。
+        # （思考だけで max_tokens を使い切ると text ブロックが無く、空の回答になる）
+        usage = getattr(response, "usage", None)
+        self.last_meta = {
+            "stop_reason": getattr(response, "stop_reason", None),
+            "block_types": [getattr(b, "type", None) for b in response.content],
+            "output_tokens": getattr(usage, "output_tokens", None),
+            "max_tokens": model.get("max_tokens", 800),
+            "empty_answer": not answer.strip(),
+        }
+        return answer
 
     # ------------------------------------------------------------------ #
     # Google Gemini

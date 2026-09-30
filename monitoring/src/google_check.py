@@ -38,6 +38,8 @@ QUESTION_FILES = [("set1", CONFIG_DIR / "questions.json"), ("set2", CONFIG_DIR /
 
 # 自社ドメイン（detection_keywords.json の domain_urls に加えて）
 EXTRA_OWN_DOMAINS = ["onward-raffiria.shop"]
+# グループサイト（自社にも競合にも数えない。分析ダッシュボードでは別枠で表示）
+GROUP_DOMAINS = ["onward-hd.co.jp"]
 TOP_N = 10
 
 COLUMNS = ["月", "観測日時", "検索語", "種別", "設問ID", "自社最高順位", "自社URL", "AI Overview",
@@ -329,14 +331,25 @@ def _norm_domain(s):
 
 
 def competitor_list():
+    """競合（kind=comp）と媒体（kind=media：情報を載せる先。競合には数えない）の一覧。"""
     d = _load_json(COMPETITOR_DOM, {"competitors": []})
     ai = {c.get("canonical") for c in _load_json(COMPETITORS_JSON, {}).get("competitors", [])}
-    return [dict(c, in_ai=c.get("canonical") in ai) for c in d.get("competitors", [])]
+    out = [dict(c, kind="comp", in_ai=c.get("canonical") in ai) for c in d.get("competitors", [])]
+    out += [dict(c, canonical=c.get("name", ""), kind="media", group="媒体", in_ai=False) for c in d.get("media", [])]
+    return out
+
+
+def media_domains():
+    d = _load_json(COMPETITOR_DOM, {})
+    return sorted({x.lower() for c in d.get("media", []) for x in c.get("domains", [])})
 
 
 def upsert_competitor(payload):
-    """{canonical, domains:[...], aliases:[...], note, also_ai:bool} を追加・更新する。"""
+    """{canonical, domains:[...], kind: comp|media, aliases:[...], note, also_ai:bool} を追加・更新する。
+    kind=media は「媒体」（PR TIMES・YouTube など情報を載せる先）として登録し、競合には数えない。"""
     name = _clean(payload.get("canonical"), 60)
+    kind = "media" if payload.get("kind") == "media" else "comp"
+    key, name_key = ("media", "name") if kind == "media" else ("competitors", "canonical")
     doms = []
     for x in payload.get("domains") or []:
         h = _norm_domain(x)
@@ -347,28 +360,32 @@ def upsert_competitor(payload):
     if not doms:
         return {"ok": False, "message": "ドメインを1つ以上入力してください（例：nagaileben.co.jp）"}
     if any(match_domain(h, own_domains()) for h in doms):
-        return {"ok": False, "message": "自社のドメインは競合に登録できません"}
+        return {"ok": False, "message": "自社のドメインは登録できません"}
+    if any(match_domain(h, GROUP_DOMAINS) for h in doms):
+        return {"ok": False, "message": "グループサイトのドメインは登録できません（別枠で表示しています）"}
     with _lock:
         d = _load_json(COMPETITOR_DOM, {"competitors": []})
-        items = d.get("competitors", [])
-        # 同じドメインを別の会社が持っていたら、そちらから外す（1ドメイン＝1社）
-        for c in items:
-            if c.get("canonical") != name:
-                c["domains"] = [x for x in c.get("domains", []) if x not in doms]
-        cur = next((c for c in items if c.get("canonical") == name), None)
+        # 同じドメインを別の会社・媒体が持っていたら、そちらから外す（1ドメイン＝1件）
+        for k2, nk2 in (("competitors", "canonical"), ("media", "name")):
+            for c in d.get(k2, []):
+                if not (k2 == key and c.get(nk2) == name):
+                    c["domains"] = [x for x in c.get("domains", []) if x not in doms]
+            if k2 in d:
+                d[k2] = [c for c in d[k2] if c.get("domains")]
+        items = d.setdefault(key, [])
+        cur = next((c for c in items if c.get(name_key) == name), None)
         if cur is None:
-            cur = {"canonical": name, "group": "手動", "domains": []}
+            cur = {name_key: name, "domains": []} if kind == "media" else {"canonical": name, "group": "手動", "domains": []}
             items.append(cur)
         cur["domains"] = doms
         note = _clean(payload.get("note"), 120)
         if note:
             cur["note"] = note
         cur.setdefault("added", datetime.now().strftime("%Y-%m-%d"))
-        d["competitors"] = [c for c in items if c.get("domains")]
-        _write_json_lines(COMPETITOR_DOM, d, "competitors", d["competitors"])
+        _write_dict(d)
 
         ai_msg = ""
-        if payload.get("also_ai"):
+        if kind == "comp" and payload.get("also_ai"):
             aliases = [name] + [_clean(a, 60) for a in (payload.get("aliases") or []) if _clean(a, 60)]
             j = _load_json(COMPETITORS_JSON, None)
             if isinstance(j, dict):
@@ -381,17 +398,35 @@ def upsert_competitor(payload):
                 _write_json_lines(COMPETITORS_JSON, j, "competitors", lst)
                 ai_msg = "（AI 回答の競合辞書にも追加）"
     n = rejudge_all()
-    return {"ok": True, "message": f"「{name}」を登録しました{ai_msg}。記録済み {n} 件の競合判定を更新しました。"}
+    what = "媒体" if kind == "media" else "競合"
+    return {"ok": True, "message": f"「{name}」を{what}として登録しました{ai_msg}。記録済み {n} 件の競合判定を更新しました。"}
 
 
-def delete_competitor(name):
+def _write_dict(d):
+    """google_competitor_domains.json を、competitors と media を「1件1行」で書く。"""
+    NL = "\n"
+    parts = []
+    for k, v in d.items():
+        name = json.dumps(k, ensure_ascii=False)
+        if k in ("competitors", "media") and isinstance(v, list):
+            body = ("," + NL).join(f"    {json.dumps(it, ensure_ascii=False)}" for it in v)
+            parts.append(f"  {name}: [{NL}{body}{NL}  ]")
+        else:
+            parts.append(f"  {name}: " + json.dumps(v, ensure_ascii=False, indent=2).replace(NL, NL + "  "))
+    tmp = COMPETITOR_DOM.with_suffix(".tmp")
+    tmp.write_text("{" + NL + ("," + NL + NL).join(parts) + NL + "}" + NL, encoding="utf-8")
+    tmp.replace(COMPETITOR_DOM)
+
+
+def delete_competitor(name, kind="comp"):
+    key, name_key = ("media", "name") if kind == "media" else ("competitors", "canonical")
     with _lock:
         d = _load_json(COMPETITOR_DOM, {"competitors": []})
-        before = len(d.get("competitors", []))
-        d["competitors"] = [c for c in d.get("competitors", []) if c.get("canonical") != name]
-        if len(d["competitors"]) == before:
+        before = len(d.get(key, []))
+        d[key] = [c for c in d.get(key, []) if c.get(name_key) != name]
+        if len(d[key]) == before:
             return {"ok": False, "message": "登録がありません"}
-        _write_json_lines(COMPETITOR_DOM, d, "competitors", d["competitors"])
+        _write_dict(d)
     n = rejudge_all()
     return {"ok": True, "message": f"「{name}」を削除しました。記録済み {n} 件の競合判定を更新しました。"}
 
@@ -418,8 +453,8 @@ def rejudge_all():
 
 
 def domain_suggestions(month=None, limit=15):
-    """記録済みの上位10件によく出るが、自社でも登録済みの競合でもないドメイン（競合追加の候補）。"""
-    own, comp = own_domains(), competitor_domains()
+    """記録済みの上位10件によく出るが、自社・グループ・登録済みの競合・媒体のどれでもないドメイン（追加の候補）。"""
+    own, comp = own_domains() + GROUP_DOMAINS + media_domains(), competitor_domains()
     cnt = {}
     for r in load_records(month or this_month()).values():
         try:

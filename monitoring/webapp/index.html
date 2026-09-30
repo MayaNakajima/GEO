@@ -178,11 +178,13 @@
     <h3>一覧 <label class="chk" style="display:inline-flex;margin-left:10px"><input type="checkbox" id="gc-only-todo"> 未記録のみ表示</label></h3>
     <div id="gc-manual" class="gc-manual hidden"></div>
     <div class="gc-table-wrap"><table class="hist" id="gc-table"></table></div>
-    <details class="gc-comp" id="gc-comp"><summary><b>競合辞書（検索結果の競合判定）</b> <span class="muted" id="gc-comp-count"></span></summary>
-      <p class="hint">検索結果の上位10件に、ここに登録したドメインのサイトが出ると「競合」として記録します。
+    <details class="gc-comp" id="gc-comp"><summary><b>競合・媒体の辞書（検索結果の判定）</b> <span class="muted" id="gc-comp-count"></span></summary>
+      <p class="hint">検索結果の上位10件に、「競合」に登録したドメインのサイトが出ると競合として記録します。
+        「媒体」（PR TIMES・YouTube など情報を載せる先）は競合には数えず、分析ダッシュボードの「外部での言及を増やす」に載せる先の候補として出ます。
         登録・削除すると、記録済みの検索結果の競合判定も自動でやり直します（手入力の記録は変わりません）。</p>
       <div class="row gc-comp-form">
-        <label>会社名 <input type="text" id="gcc-name" size="16" placeholder="例：ナガイレーベン"></label>
+        <label>種類 <select id="gcc-kind"><option value="comp">競合</option><option value="media">媒体</option></select></label>
+        <label>名前 <input type="text" id="gcc-name" size="16" placeholder="例：ナガイレーベン／PR TIMES"></label>
         <label>ドメイン <input type="text" id="gcc-domains" size="30" placeholder="例：nagaileben.co.jp（複数はカンマ区切り）"></label>
         <label>メモ <input type="text" id="gcc-note" size="16"></label>
       </div>

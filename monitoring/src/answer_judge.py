@@ -9,8 +9,8 @@
   ・推される理由  … competitors.json の観点（attributes）から選ぶ
 
 判定結果から次を集計して data/judge_report.html にまとめる。
-  1) 名前が出たあと、最後のおすすめまで残った割合（自社・競合）
-  2) 立場別の自社の扱い（1社だけおすすめ／他社と並ぶ／外れる／並ぶだけ／出ない）
+  1) 名前が出たあと、最後のおすすめまで残った割合（当社・競合）
+  2) 立場別の当社の扱い（1社だけおすすめ／他社と並ぶ／外れる／並ぶだけ／出ない）
   3) 会社ごとの推される理由
   4) おすすめの顔ぶれが固まっているか（直近の実行回をまたいで同じ質問を比べる）
   5) 施策の示唆（ルールで作成）
@@ -68,7 +68,7 @@ REC_KINDS = (KIND_PICK, KIND_LIST)  # 推薦の形の回答
 
 OTHER_REASON = "その他"
 
-# 自社の扱い（推薦の形の回答だけに付ける）
+# 当社の扱い（推薦の形の回答だけに付ける）
 ST_ONLY = "1社だけおすすめ"
 ST_WITH = "他社と並んでおすすめ"
 ST_DROP = "おすすめから外れる"
@@ -92,7 +92,7 @@ def load_cfg() -> dict:
     cfg.setdefault("report_runs", 5)
     cfg.setdefault("stability_min_runs", 3)
     cfg.setdefault("stability_threshold", 0.8)
-    cfg.setdefault("own_label", "自社")
+    cfg.setdefault("own_label", "当社")
     cfg.setdefault("own_aliases_extra", [])
     return cfg
 
@@ -202,7 +202,7 @@ class AnswerJudge:
 
     # ---- 会社名をそろえる ---- #
     def canonical(self, name: str) -> tuple:
-        """表記 → (そろえた名前, 自社か)。"""
+        """表記 → (そろえた名前, 当社か)。"""
         low = (name or "").strip().lower()
         if any(a in low for a in self.own_aliases):
             return self.own_label, True
@@ -419,7 +419,7 @@ def build_report(runs: list, judge: AnswerJudge, cfg: dict) -> dict:
                 for n in top_names]
     survival.sort(key=lambda x: (not x["is_own"], -x["listed"]))
 
-    # ---- 2) 立場別の自社の扱い ---- #
+    # ---- 2) 立場別の当社の扱い ---- #
     by_st = defaultdict(Counter)
     non_rec = Counter()
     for it in items:
@@ -539,7 +539,7 @@ G_HINTS = {
     G_NOT_CONVEYED: "ページはあり、GoogleのAIによる概要も引用している。Claudeは学習済みの知識で答えるため、外部での言及を増やすのが打ち手（Google参考値タブの「外部での言及を増やす」）",
     G_SERP_ONLY: "検索結果の上位10件には入るが、AIによる概要には引用されていない。AIが引用しやすい形にページを直すのが打ち手（同「AI向けにページを直す」）",
     G_NO_PAGE: "Googleでも上位10件に入らず、AIによる概要にも引用されていない。質問に答えるページを作る・順位を上げるのが打ち手（同「順位を上げる」）",
-    G_BOTH: "Claude・Googleの両方で自社が出ている",
+    G_BOTH: "Claude・Googleの両方で当社が出ている",
     G_CLAUDE_ONLY: "Claudeでは出るが、Googleでは上位10件・AIによる概要のどちらにも出ていない",
     G_NO_DATA: "この質問の検索チェックがまだ記録されていない",
 }
@@ -655,7 +655,7 @@ def _suggestions(rep: dict) -> list:
     elif s["rec"]:
         out.append({"title": "最後まで残れているか",
                     "text": f"最後に絞り込む回答（{KIND_PICK}）は推薦の形の回答 {s['rec']}件中 {s['pick']}件で、"
-                            f"その中で自社の名前が出たのは {s['own_listed']}回です。"
+                            f"その中で当社の名前が出たのは {s['own_listed']}回です。"
                             "残り方を比べるには少ないため、まず名前が出ることを課題として見てください。"})
 
     # 名前が出ない立場
@@ -666,7 +666,7 @@ def _suggestions(rep: dict) -> list:
             break
         out.append({"title": f"{r['stakeholder']}の質問で名前が出ない",
                     "text": f"推薦の形の回答 {r['rec_total']}件中 {r['counts'][ST_ABSENT]}件"
-                            f"（{r['absent_rate']}%）で自社の名前が出ていません。"
+                            f"（{r['absent_rate']}%）で当社の名前が出ていません。"
                             "この立場の質問でよく挙がる会社と、その理由を原文で確認し、"
                             "同じ観点の記述をサイトと外部での言及に入れることが候補です。"})
 
@@ -682,15 +682,15 @@ def _suggestions(rep: dict) -> list:
                 gaps.append((row["reason"], own_v, round(avg, 1)))
         gaps.sort(key=lambda g: -(g[2] - g[1]))
         if gaps:
-            txt = "、".join(f"{g[0]}（競合平均 {g[2]}% ／ 自社 {g[1]}%）" for g in gaps[:3])
-            out.append({"title": "競合は推されているのに、自社は語られていない理由",
+            txt = "、".join(f"{g[0]}（競合平均 {g[2]}% ／ 当社 {g[1]}%）" for g in gaps[:3])
+            out.append({"title": "競合は推されているのに、当社は語られていない理由",
                         "text": f"{txt}。これらの観点の具体的な記述（数値・規格・体制など）を、"
                                 "サイトのページと、外部での言及（事例記事・業界メディアなど）の両方に入れることが候補です。"})
         strong = sorted(rep["reasons"]["rows"], key=lambda r: -r["values"][0])[:2]
         strong = [r for r in strong if r["values"][0] > 0]
         if strong:
-            out.append({"title": "自社が推されている理由（強み）",
-                        "text": f"自社の名前が出た推薦の形の回答 {cols[0]['listed']}件のうち、" + "、".join(f"{r['reason']}（{r['values'][0]}%）" for r in strong)
+            out.append({"title": "当社が推されている理由（強み）",
+                        "text": f"当社の名前が出た推薦の形の回答 {cols[0]['listed']}件のうち、" + "、".join(f"{r['reason']}（{r['values'][0]}%）" for r in strong)
                                 + "。今の記述は残し、ほかのページにも広げると効果が期待できます。"})
 
     # 顔ぶれが固まっていない質問
@@ -723,7 +723,7 @@ def _suggestions(rep: dict) -> list:
                         "title": "Googleでも引用されていない質問",
                         "text": (f"{n_serp}問は検索の上位10件に入るがAIによる概要に引用されていません（AI向けにページを直す）。"
                                  if n_serp else "")
-                                + (f"{n_np}問は上位10件にもAIによる概要にも自社が出ていません（ページを作る・順位を上げる）。"
+                                + (f"{n_np}問は上位10件にもAIによる概要にも当社が出ていません（ページを作る・順位を上げる）。"
                                    if n_np else "")})
     return out
 
@@ -770,7 +770,7 @@ def render_html(rep: dict, out_path: Path) -> Path:
     if st["questions"]:
         stab_html = (f"<div class='grid2'><div class='card'>{table(['立場', '固まっている質問'], stab_rows)}</div>"
                      f"<div class='card'><b>固まっていない質問（狙い目）</b>"
-                     f"{table(['質問', '立場', '最も多く残った会社', '残った回', '自社が残った回'], un_rows)}</div></div>")
+                     f"{table(['質問', '立場', '最も多く残った会社', '残った回', '当社が残った回'], un_rows)}</div></div>")
     else:
         stab_html = (f"<div class='card muted'>同じ質問を {st['min_runs']}回以上判定できていないため、まだ比べられません。"
                      "実行回が増えると表示されます。</div>")
@@ -815,10 +815,10 @@ td.small{{font-size:12px}}tr.own td{{background:#eef4ff;font-weight:600}}
 ／ 判定AI: {escape(rep['model'])}（{rep['votes']}回判定）</div>
 {pending_note}
 <div class="kpis">
-<div class="kpi"><div class="v">{s['own_kept_rate']}%</div><div class="l">自社：名前が出たあと最後まで残った割合<br>（{s['own_kept']}/{s['own_listed']}回）</div></div>
+<div class="kpi"><div class="v">{s['own_kept_rate']}%</div><div class="l">当社：名前が出たあと最後まで残った割合<br>（{s['own_kept']}/{s['own_listed']}回）</div></div>
 <div class="kpi"><div class="v">{s['kept_rate']}%</div><div class="l">全社平均の残った割合<br>（{s['kept_total']}/{s['listed_total']}回）</div></div>
 <div class="kpi"><div class="v">{s['rec']}</div><div class="l">推薦の形の回答<br>（判定済み {s['judged']}件中）</div></div>
-<div class="kpi"><div class="v">{s['own_status_total'][ST_ABSENT]}</div><div class="l">推薦の形なのに<br>自社の名前が出ない回答</div></div>
+<div class="kpi"><div class="v">{s['own_status_total'][ST_ABSENT]}</div><div class="l">推薦の形なのに<br>当社の名前が出ない回答</div></div>
 </div>
 <div class="note">回答の形：{escape(kinds)}</div>
 
@@ -829,9 +829,9 @@ td.small{{font-size:12px}}tr.own td{{background:#eef4ff;font-weight:600}}
 <div class="card">{table(['会社', '名前が出た回', '最後まで残った回', '残った割合'], surv_rows)}
 <div class="note">「{KIND_PICK}」（候補を並べて最後に絞り込んだ）回答だけで計算。名前が出る回数と、最後まで残るかは別の力です。</div></div>
 
-<h2>② 立場別の自社の扱い（推薦の形の回答）</h2>
+<h2>② 立場別の当社の扱い（推薦の形の回答）</h2>
 <div class="card">{table(['立場', '推薦の形の回答'] + OWN_STATUSES + ['推薦の形でない回答'], st_rows)}
-<div class="note">「並ぶだけ」は、候補を並べただけで絞り込みのない回答に自社が入っていたもの。赤字は名前が出ない割合が半分以上の立場。</div></div>
+<div class="note">「並ぶだけ」は、候補を並べただけで絞り込みのない回答に当社が入っていたもの。赤字は名前が出ない割合が半分以上の立場。</div></div>
 
 <h2>③ 会社ごとの推される理由</h2>
 <div class="card">{table(rs_head, rs_rows) if cols else '<p class="muted">データがありません。</p>'}
@@ -883,12 +883,12 @@ def _google_html(g: dict, table) -> str:
             f"<td class='small'>{escape('、'.join(q['comps_also_in_google']) or '－')}</td></tr>")
     return (f"<div class='card'>{table(['分類', '質問数', '読み方'], sum_rows)}"
             f"<div class='note'>Google: {escape(g['month'])} の検索チェック（{g['terms']}件の検索語。設問文と観測キーワード）。"
-            "Claude: 対象の回のうち1回でも自社の名前が出れば「出る」。Google: 設問文・観測キーワードのどれかで、"
-            "AIによる概要に自社が引用されたか／上位10件に自社が入ったか。</div></div>"
+            "Claude: 対象の回のうち1回でも当社の名前が出れば「出る」。Google: 設問文・観測キーワードのどれかで、"
+            "AIによる概要に当社が引用されたか／上位10件に当社が入ったか。</div></div>"
             f"<div class='card' style='margin-top:16px'><b>立場別</b>"
             f"{table(['立場'] + [short[c] for c in G_CATEGORIES] + ['計'], st_rows)}</div>"
             f"<div class='card' style='margin-top:16px'><b>Claudeで名前が出ない・Claudeだけ出る質問</b>"
-            f"{table(['分類', '質問', '立場', 'Claudeで出た回', 'AIによる概要に自社引用', '自社の最高順位', '自社URL（最高順位）', 'Claudeがよく挙げる会社', 'そのうちGoogleでも上位の会社'], q_rows)}"
+            f"{table(['分類', '質問', '立場', 'Claudeで出た回', 'AIによる概要に当社引用', '当社の最高順位', '当社URL（最高順位）', 'Claudeがよく挙げる会社', 'そのうちGoogleでも上位の会社'], q_rows)}"
             "<div class='note'>赤字（Google引用・Claude×）は、ページの内容はAIに使える状態で、外部での言及を増やすのが打ち手の質問です。"
             "「Googleでも上位の会社」は、Claudeがよく挙げる会社のうち検索の上位10件にも入っていた会社。</div></div>")
 
@@ -944,7 +944,7 @@ def main(argv=None):
         return 0
     s = rep["summary"]
     print(f"[judge] 判定済み {s['judged']}/{s['answers']}件 ／ 推薦の形 {s['rec']}件")
-    print(f"[judge] 自社：名前が出たあと最後まで残った割合 {s['own_kept_rate']}%"
+    print(f"[judge] 当社：名前が出たあと最後まで残った割合 {s['own_kept_rate']}%"
           f"（{s['own_kept']}/{s['own_listed']}）")
     out = DATA_DIR / "judge_report.html"
     print(f"[judge] HTML: {out}")

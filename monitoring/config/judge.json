@@ -23,7 +23,7 @@
   "stability_threshold": 0.8,
   "_comment_stability": "同じ質問を stability_min_runs 回以上判定できたとき、最後のおすすめの1位の会社が threshold 以上の割合で同じなら『顔ぶれが固まっている』とみなす（0.8 = 5回中4回）。",
 
-  "own_label": "自社（オンワードコーポレートデザイン）",
+  "own_label": "当社（オンワードコーポレートデザイン）",
   "own_aliases_extra": ["オンワード商事", "オンワードクリエイティブセンター", "オンワードコーポレート"],
-  "_comment_own": "自社とみなす表記。detection_keywords.json の primary / secondary に、ここの表記（旧社名など）を加えて判定する。"
+  "_comment_own": "当社とみなす表記。detection_keywords.json の primary / secondary に、ここの表記（旧社名など）を加えて判定する。"
 }

@@ -536,9 +536,9 @@ G_CLAUDE_ONLY = "Claudeだけ出る"
 G_NO_DATA = "検索チェック未記録"
 G_CATEGORIES = [G_NOT_CONVEYED, G_SERP_ONLY, G_NO_PAGE, G_BOTH, G_CLAUDE_ONLY, G_NO_DATA]
 G_HINTS = {
-    G_NOT_CONVEYED: "ページはあり、GoogleのAIによる概要も引用している。Claudeに推す理由として伝わる書き方（業種・機能・実績の具体）が足りない可能性",
-    G_SERP_ONLY: "検索結果の上位10件には入るが、AIによる概要には引用されていない。ページの中身がAIに答えとして使われにくい可能性",
-    G_NO_PAGE: "Googleでも上位10件に入らず、AIによる概要にも引用されていない。質問に答えるページ自体が足りない可能性",
+    G_NOT_CONVEYED: "ページはあり、GoogleのAIによる概要も引用している。Claudeは学習済みの知識で答えるため、外部での言及を増やすのが打ち手（Google参考値タブの「外部での言及を増やす」）",
+    G_SERP_ONLY: "検索結果の上位10件には入るが、AIによる概要には引用されていない。AIが引用しやすい形にページを直すのが打ち手（同「AI向けにページを直す」）",
+    G_NO_PAGE: "Googleでも上位10件に入らず、AIによる概要にも引用されていない。質問に答えるページを作る・順位を上げるのが打ち手（同「順位を上げる」）",
     G_BOTH: "Claude・Googleの両方で自社が出ている",
     G_CLAUDE_ONLY: "Claudeでは出るが、Googleでは上位10件・AIによる概要のどちらにも出ていない",
     G_NO_DATA: "この質問の検索チェックがまだ記録されていない",
@@ -668,7 +668,7 @@ def _suggestions(rep: dict) -> list:
                     "text": f"推薦の形の回答 {r['rec_total']}件中 {r['counts'][ST_ABSENT]}件"
                             f"（{r['absent_rate']}%）で自社の名前が出ていません。"
                             "この立場の質問でよく挙がる会社と、その理由を原文で確認し、"
-                            "同じ観点の記述をサイトに足すことが候補です。"})
+                            "同じ観点の記述をサイトと外部での言及に入れることが候補です。"})
 
     # 理由の差
     cols = rep["reasons"]["columns"]
@@ -685,7 +685,7 @@ def _suggestions(rep: dict) -> list:
             txt = "、".join(f"{g[0]}（競合平均 {g[2]}% ／ 自社 {g[1]}%）" for g in gaps[:3])
             out.append({"title": "競合は推されているのに、自社は語られていない理由",
                         "text": f"{txt}。これらの観点の具体的な記述（数値・規格・体制など）を、"
-                                "AIがよく読むページに書き足すことが候補です。"})
+                                "サイトのページと、外部での言及（事例記事・業界メディアなど）の両方に入れることが候補です。"})
         strong = sorted(rep["reasons"]["rows"], key=lambda r: -r["values"][0])[:2]
         strong = [r for r in strong if r["values"][0] > 0]
         if strong:
@@ -710,18 +710,21 @@ def _suggestions(rep: dict) -> list:
     gc = g.get("counts") or {}
     if g.get("questions"):
         n_nc, n_serp, n_np = gc.get(G_NOT_CONVEYED, 0), gc.get(G_SERP_ONLY, 0), gc.get(G_NO_PAGE, 0)
-        out.append({"title": "Googleでは引用されているのに、Claudeでは名前が出ない質問",
+        # 判断は分析ダッシュボード（GEO-analysis）の Google参考値タブの「次にやること」と同じ考え方にそろえる
+        out.append({"kind": "google",
+                    "title": "Googleでは引用されているのに、Claudeでは名前が出ない質問",
                     "text": f"{n_nc}問あります（Google {g['month']} の検索チェックと突き合わせ）。"
-                            "ページはあり、GoogleのAIによる概要にも引用されているので、新しく作るより、"
-                            "そのページ（⑤の表の自社URL）に業種・機能・実績などの推す理由を具体的に書き足すのが近道です。"
+                            "ページの内容はAIに使える状態です。Claudeは検索せず学習済みの知識で答えるため、"
+                            "業界メディア・比較記事など外部での言及を増やすことが打ち手です（推される理由の差にある観点を、言及してもらう内容に含める）。"
                             if n_nc else
                             f"0問でした（Google {g['month']} の検索チェックと突き合わせ）。"})
-        if n_np:
-            out.append({"title": "Googleでも出ていない質問（ページが足りない）",
-                        "text": f"{n_np}問は、Googleの上位10件にもAIによる概要にも自社が出ていません。"
-                                f"この質問に答えるページを新しく作る候補です。"
-                                + (f" ほかに、検索の上位10件には入るがAIによる概要に引用されない質問が {n_serp}問あります。"
-                                   if n_serp else "")})
+        if n_np or n_serp:
+            out.append({"kind": "google",
+                        "title": "Googleでも引用されていない質問",
+                        "text": (f"{n_serp}問は検索の上位10件に入るがAIによる概要に引用されていません（AI向けにページを直す）。"
+                                 if n_serp else "")
+                                + (f"{n_np}問は上位10件にもAIによる概要にも自社が出ていません（ページを作る・順位を上げる）。"
+                                   if n_np else "")})
     return out
 
 
@@ -886,7 +889,7 @@ def _google_html(g: dict, table) -> str:
             f"{table(['立場'] + [short[c] for c in G_CATEGORIES] + ['計'], st_rows)}</div>"
             f"<div class='card' style='margin-top:16px'><b>Claudeで名前が出ない・Claudeだけ出る質問</b>"
             f"{table(['分類', '質問', '立場', 'Claudeで出た回', 'AIによる概要に自社引用', '自社の最高順位', '自社URL（最高順位）', 'Claudeがよく挙げる会社', 'そのうちGoogleでも上位の会社'], q_rows)}"
-            "<div class='note'>赤字（Google引用・Claude×）が、書き足しで効果が出やすい質問です。"
+            "<div class='note'>赤字（Google引用・Claude×）は、ページの内容はAIに使える状態で、外部での言及を増やすのが打ち手の質問です。"
             "「Googleでも上位の会社」は、Claudeがよく挙げる会社のうち検索の上位10件にも入っていた会社。</div></div>")
 
 

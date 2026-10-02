@@ -185,6 +185,18 @@ def execute_timing(plan: dict, dry_run: bool = False,
     except Exception as e:
         print(f"[engine] 示唆レポート生成エラー: {e}")
 
+    # ---- 回答の読み取り判定（config/judge.json の auto_after_run が true のときだけ。非致命的） ---- #
+    if not dry_run:
+        try:
+            import answer_judge
+            jcfg = answer_judge.load_cfg()
+            if jcfg.get("auto_after_run"):
+                progress_cb({"phase": "judge", "timing_id": timing_id})
+                answer_judge.run(answer_judge.latest_runs(int(jcfg["report_runs"])), cfg=jcfg)
+                print("[engine] 回答の読み取り判定: data/judge_report.html")
+        except Exception as e:
+            print(f"[engine] 回答の読み取り判定エラー: {e}")
+
     # ---- Teams 通知（Webhook 設定時のみ） ---- #
     try:
         reporter.notify_teams(_teams_payload(timing_report, run_results_list))

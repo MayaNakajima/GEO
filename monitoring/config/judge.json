@@ -1,0 +1,29 @@
+{
+  "_comment": "回答の読み取り判定（answer_judge.py）の設定。AIの回答を別のAIに読ませ、挙がった会社・最後に絞り込まれたおすすめ・推される理由を判定する。",
+
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "max_tokens": 16000,
+  "fallbacks": "default",
+  "_comment_fallbacks": "判定AIが安全上の理由で処理を断ったとき、別のモデルで自動的にやり直す設定。使わない場合は null。",
+
+  "votes": 1,
+  "_comment_votes": "1つの回答を何回判定するか。3にすると3回判定して多数決をとる（ぶれは減るが費用は3倍）。",
+
+  "workers": 4,
+  "_comment_workers": "同時に判定する件数。",
+
+  "report_runs": 5,
+  "_comment_report_runs": "レポートの対象にする直近の実行回数（results CSV の数）。顔ぶれの固定度もこの範囲で見る。",
+
+  "auto_after_run": true,
+  "_comment_auto": "true にすると、定期実行・GUI実行のあとに新しい回答を自動で判定してレポートを作り直す（判定済みの回答は再判定しない）。",
+
+  "stability_min_runs": 3,
+  "stability_threshold": 0.8,
+  "_comment_stability": "同じ質問を stability_min_runs 回以上判定できたとき、最後のおすすめの1位の会社が threshold 以上の割合で同じなら『顔ぶれが固まっている』とみなす（0.8 = 5回中4回）。",
+
+  "own_label": "自社（オンワードコーポレートデザイン）",
+  "own_aliases_extra": ["オンワード商事", "オンワードクリエイティブセンター", "オンワードコーポレート"],
+  "_comment_own": "自社とみなす表記。detection_keywords.json の primary / secondary に、ここの表記（旧社名など）を加えて判定する。"
+}

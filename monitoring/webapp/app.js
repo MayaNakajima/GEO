@@ -100,6 +100,7 @@ function buildRule(){
   else if(kind==="monthly_day") r.day = parseInt($("#f-day").value||"1");
   else if(kind==="nth_weekday"){ r.nth = parseInt($("#f-nth").value); r.weekday = parseInt($("#f-wd").value); }
   else if(kind==="nth_business_day") r.nth = parseInt($("#f-nth").value||"1");
+  if($("#freq-holiday").checked) r.holiday_shift = "next_business_day";
   return r;
 }
 
@@ -298,6 +299,7 @@ function bindEvents(){
   });
   $("#freq-kind").onchange = renderFreqFields;
   $("#freq-time").onchange = previewSchedule;
+  $("#freq-holiday").onchange = previewSchedule;
   $("#freq-fields").addEventListener("change", previewSchedule);
   $$('input[name=start]').forEach(r=>r.onchange = previewSchedule);
   $("#start-min").onchange = previewSchedule;

@@ -118,6 +118,8 @@ class JobManager:
                         "waited_sec": info["waited_sec"], "wait_total_sec": info["wait_total_sec"]})
         elif phase == "aggregate":
             self._log("集計・レポート生成中…")
+        elif phase == "judge":
+            self._log("回答の読み取り判定中…")
         elif phase == "done":
             self._log(f"タイミング完了：平均 {info['overall_mean']}% / SD ±{info['overall_sd']}pt / "
                       f"安定性 {info['stability']}%")

@@ -35,6 +35,8 @@ monitoring/data/reports/*
 monitoring/data/google_check/*
 monitoring/data/dashboard.html
 monitoring/data/insights.html
+monitoring/data/judge_report.html
+monitoring/data/judgments/
 monitoring/data/run_log.txt
 monitoring/data/.scheduled.lock
 monitoring/data/last_run.json

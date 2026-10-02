@@ -111,7 +111,27 @@ def _monday_of(d: date) -> date:
 # ルール判定
 # ------------------------------------------------------------------ #
 def rule_matches(rule: dict, d: date, anchor: date) -> bool:
-    """日付 d が頻度ルールに該当するか。anchor は開始基準日。"""
+    """日付 d が頻度ルールに該当するか。anchor は開始基準日。
+
+    rule に "holiday_shift": "next_business_day" があれば、該当日が土日・祝日のとき
+    翌営業日に実行日をずらす（例: 第1火曜が祝日なら水曜）。
+    """
+    if rule.get("holiday_shift") == "next_business_day":
+        if not is_business_day(d):
+            return False
+        if _base_matches(rule, d, anchor):
+            return True
+        # 直前の休日が続く間に本来の該当日があれば、今日（休み明けの営業日）が実行日
+        p = d - timedelta(days=1)
+        while not is_business_day(p) and p >= anchor:
+            if _base_matches(rule, p, anchor):
+                return True
+            p -= timedelta(days=1)
+        return False
+    return _base_matches(rule, d, anchor)
+
+
+def _base_matches(rule: dict, d: date, anchor: date) -> bool:
     kind = rule.get("kind")
 
     if kind == "every_n_days":
@@ -203,6 +223,13 @@ _WD = ["月", "火", "水", "木", "金", "土", "日"]
 
 
 def describe_rule(rule: dict) -> str:
+    desc = _describe_base(rule)
+    if rule.get("holiday_shift") == "next_business_day":
+        desc += "（土日・祝日なら翌営業日）"
+    return desc
+
+
+def _describe_base(rule: dict) -> str:
     kind = rule.get("kind")
     t = rule.get("time", "09:00")
     if kind == "every_n_days":

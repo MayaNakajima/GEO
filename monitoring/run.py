@@ -28,6 +28,7 @@ MENU = """
   2) 接続診断（APIに接続できるか確認）
   3) データを全削除（検証データの一掃）
   4) データを選択削除（番号で選んで削除）
+  5) 回答の読み取り判定（最後のおすすめに残るか・推される理由）
   0) 終了
 ============================================================
 """
@@ -59,11 +60,17 @@ def main():
         elif c == "4":
             run("src/reset_data.py", "--select")
             input("\nEnterでメニューに戻ります…")
+        elif c == "5":
+            run("src/answer_judge.py", "--dry-run")
+            yn = input("\n判定を実行しますか？（AIの利用料がかかります） y/n > ").strip().lower()
+            if yn == "y":
+                run("src/answer_judge.py", "--open")
+            input("\nEnterでメニューに戻ります…")
         elif c == "0":
             print("終了します。")
             return
         else:
-            print("1〜4 または 0 を入力してください。")
+            print("1〜5 または 0 を入力してください。")
 
 
 if __name__ == "__main__":
